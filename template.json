@@ -272,6 +272,29 @@
         "atWill": 0,
         "scene": 0,
         "day": 0
+      },
+      "attack": {
+        "enabled": false,
+        "name": "",
+        "attr": "str",
+        "hitBonus": 0,
+        "range": "Melee / 30ft",
+        "area": "Single Target",
+        "damageRoll": "1d8",
+        "damageBonus": 0,
+        "magic": false,
+        "damageType": "physical",
+        "guaranteedMinDamage": 0,
+        "autoHit": false,
+        "maxDamage": false,
+        "areaAttack": false
+      },
+      "aoe": {
+        "enabled": false,
+        "shape": "circle",
+        "radius": 0,
+        "width": 0,
+        "perLevel": false
       }
     },
     "artifactPower": {
@@ -384,6 +407,13 @@
     "art": {
       "category": "martialStrife",
       "description": "",
+      "aoe": {
+        "enabled": false,
+        "shape": "circle",
+        "radius": 0,
+        "width": 0,
+        "perLevel": false
+      },
       "usable": false,
       "constant": false,
       "instant": false,
@@ -414,6 +444,13 @@
       "artId": "",
       "level": 1,
       "description": "",
+      "aoe": {
+        "enabled": false,
+        "shape": "circle",
+        "radius": 0,
+        "width": 0,
+        "perLevel": false
+      },
       "usable": true,
       "constant": false,
       "instant": false,

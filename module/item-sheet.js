@@ -122,6 +122,16 @@ export class GodboundItemSheet extends foundry.appv1.sheets.ItemSheet {
       }
     });
 
+    // Add the gift's built-in attack to the owning actor (checks for duplicates there).
+    html.find('.gift-attack-add').click(ev => {
+      ev.preventDefault();
+      if (!this.item.actor) {
+        ui.notifications.warn("Дар не принадлежит персонажу — добавьте дар персонажу и нажмите кнопку на его листе.");
+        return;
+      }
+      this.item.actor.addGiftAttack(this.item);
+    });
+
     // Everything below here is only needed if the sheet is editable
     if (!this.options.editable) return;
     html.find('.item-maybe-delete').click(ev => {

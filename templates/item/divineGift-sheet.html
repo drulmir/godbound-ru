@@ -106,6 +106,118 @@
                             </select>
                         </div>
                         <div>
+                            <label title="Дары вроде «Руки-косы»: опишите здесь атаку, которую даёт дар, и кнопкой ниже (или с листа персонажа) добавьте её владельцу — атака не будет добавлена повторно, если она уже есть">Атака дара:</label>
+                            <div style="display:flex; align-items: center">
+                                <input type="checkbox" name="system.attack.enabled" {{checked system.attack.enabled}} style="margin-left:0" />Дар даёт атаку
+                            </div>
+                        </div>
+                        {{#if system.attack.enabled}}
+                        <div>
+                            <label for="attackName" title="Пусто — атака получит имя дара">Имя атаки:</label>
+                            <input id="attackName" name="system.attack.name" type="text" value="{{system.attack.name}}" placeholder="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="attackAttr">Хар-ка:</label>
+                            <select name="system.attack.attr" id="attackAttr">
+                                {{#select system.attack.attr}}
+                                <option value="str">Сил</option>
+                                <option value="dex">Лов</option>
+                                <option value="con">Тел</option>
+                                <option value="int">Инт</option>
+                                <option value="wis">Мдр</option>
+                                <option value="cha">Хар</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="attackHitBonus">Бонус попадания:</label>
+                            <input id="attackHitBonus" name="system.attack.hitBonus" type="text" value="{{system.attack.hitBonus}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        <div>
+                            <label for="attackRange">Дальность:</label>
+                            <input id="attackRange" name="system.attack.range" type="text" value="{{system.attack.range}}"/>
+                        </div>
+                        <div>
+                            <label for="attackArea">Область:</label>
+                            <input id="attackArea" name="system.attack.area" type="text" value="{{system.attack.area}}"/>
+                        </div>
+                        <div>
+                            <label for="attackDamageRoll">Урон:</label>
+                            <div style="display: flex; align-items: center">
+                                <input id="attackDamageRoll" name="system.attack.damageRoll" type="text" value="{{system.attack.damageRoll}}" class="compactplus"/>
+                                +
+                                <input id="attackDamageBonus" name="system.attack.damageBonus" type="text" value="{{system.attack.damageBonus}}" data-dtype="Number" class="compact"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="attackDamageType">Тип урона:</label>
+                            <div style="display: flex; align-items: center">
+                                <select name="system.attack.damageType" id="attackDamageType">
+                                    {{#select system.attack.damageType}}
+                                    <option value="physical">Физический</option>
+                                    <option value="fire">Огонь</option>
+                                    <option value="cold">Холод</option>
+                                    <option value="lightning">Молния</option>
+                                    <option value="acid">Кислота</option>
+                                    <option value="poison">Яд</option>
+                                    <option value="disease">Болезнь</option>
+                                    <option value="magic">Магия</option>
+                                    <option value="holy">Свет</option>
+                                    <option value="unholy">Тьма</option>
+                                    {{/select}}
+                                </select>
+                                <input type="checkbox" name="system.attack.magic" {{checked system.attack.magic}} style="margin-left:16px;" />Магия Оружие
+                            </div>
+                        </div>
+                        <div>
+                            <label for="attackGuaranteedMinDamage" title="Урон, который проходит даже при промахе (напр. косы смерти)">Мин. урон при промахе:</label>
+                            <input id="attackGuaranteedMinDamage" name="system.attack.guaranteedMinDamage" type="text" value="{{system.attack.guaranteedMinDamage}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        <div>
+                            <label>Спец. режим:</label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.attack.autoHit" {{checked system.attack.autoHit}} style="margin-left:0" />Авто-попадание
+                                <input type="checkbox" name="system.attack.maxDamage" {{checked system.attack.maxDamage}} style="margin-left:16px;" />Макс. урон
+                                <input type="checkbox" name="system.attack.areaAttack" {{checked system.attack.areaAttack}} style="margin-left:16px;" />По площади
+                            </div>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display:flex; align-items: center">
+                                <a class="item-control gift-attack-add" title="Добавить эту атаку владельцу дара (если такой атаки у него ещё нет)"><i class="fas fa-khanda"></i> Добавить атаку персонажу</a>
+                            </div>
+                        </div>
+                        {{/if}}
+                        <div>
+                            <label title="Зона действия из описания (в футах) — на листе персонажа появится кнопка, спавнящая едва заметный шаблон зоны на карте; повторное нажатие убирает его">Зона (AoE):</label>
+                            <div style="display:flex; align-items:center">
+                                <input type="checkbox" name="system.aoe.enabled" {{checked system.aoe.enabled}} style="margin-left:0"/>Есть зона на карте
+                            </div>
+                        </div>
+                        {{#if system.aoe.enabled}}
+                        <div>
+                            <label>Форма и футы:</label>
+                            <div style="display:flex; align-items:center">
+                                <select name="system.aoe.shape">
+                                    {{#select system.aoe.shape}}
+                                    <option value="circle">Круг (радиус)</option>
+                                    <option value="cone">Конус (длина)</option>
+                                    <option value="ray">Линия (длина)</option>
+                                    <option value="rect">Куб/квадрат (сторона)</option>
+                                    {{/select}}
+                                </select>
+                                <input type="text" name="system.aoe.radius" value="{{system.aoe.radius}}" data-dtype="Number" class="compact" style="margin-left:8px;"/>
+                                <input type="checkbox" name="system.aoe.perLevel" {{checked system.aoe.perLevel}} style="margin-left:12px;" title="Умножать на уровень персонажа"/>на уровень
+                            </div>
+                        </div>
+                        {{#ifeq system.aoe.shape "ray"}}
+                        <div>
+                            <label>Ширина линии:</label>
+                            <input type="text" name="system.aoe.width" value="{{system.aoe.width}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        {{/ifeq}}
+                        {{/if}}
+                        <div>
                             <label style="vertical-align: center">Действия:</label>
                             <div class="item-controls" style="padding-top:4px;">
                                 <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>

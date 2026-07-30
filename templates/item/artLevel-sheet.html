@@ -132,6 +132,35 @@
                         </div>
                         {{/if}}
                         <div>
+                            <label title="Зона действия из описания (в футах) — на листе персонажа появится кнопка, спавнящая едва заметный шаблон зоны на карте; повторное нажатие убирает его">Зона (AoE):</label>
+                            <div style="display:flex; align-items:center">
+                                <input type="checkbox" name="system.aoe.enabled" {{checked system.aoe.enabled}} style="margin-left:0"/>Есть зона на карте
+                            </div>
+                        </div>
+                        {{#if system.aoe.enabled}}
+                        <div>
+                            <label>Форма и футы:</label>
+                            <div style="display:flex; align-items:center">
+                                <select name="system.aoe.shape">
+                                    {{#select system.aoe.shape}}
+                                    <option value="circle">Круг (радиус)</option>
+                                    <option value="cone">Конус (длина)</option>
+                                    <option value="ray">Линия (длина)</option>
+                                    <option value="rect">Куб/квадрат (сторона)</option>
+                                    {{/select}}
+                                </select>
+                                <input type="text" name="system.aoe.radius" value="{{system.aoe.radius}}" data-dtype="Number" class="compact" style="margin-left:8px;"/>
+                                <input type="checkbox" name="system.aoe.perLevel" {{checked system.aoe.perLevel}} style="margin-left:12px;" title="Умножать на уровень персонажа"/>на уровень
+                            </div>
+                        </div>
+                        {{#ifeq system.aoe.shape "ray"}}
+                        <div>
+                            <label>Ширина линии:</label>
+                            <input type="text" name="system.aoe.width" value="{{system.aoe.width}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        {{/ifeq}}
+                        {{/if}}
+                        <div>
                             <label style="vertical-align: center">Действия:</label>
                             <div class="item-controls" style="padding-top:4px;">
                                 <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>

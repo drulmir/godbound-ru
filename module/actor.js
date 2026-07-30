@@ -642,6 +642,99 @@ export class GodboundActor extends Actor {
         return runningTotal;
     }
 
+    // Toggle a barely-visible AoE zone template on the canvas for a power
+    // (gift / art / invocation) whose description defines an area in feet.
+    // First click spawns the zone centered on the actor's token (drag it to a
+    // point afterwards if the effect is targeted); second click removes it.
+    // The template is an ordinary MeasuredTemplate, so it can also be deleted
+    // from the template layer like any other.
+    async toggleAoeZone(item) {
+        const cfg = item?.system?.aoe;
+        const baseRadius = Number(cfg?.radius) || 0;
+        if (!cfg?.enabled || baseRadius <= 0) {
+            ui.notifications.warn(`У «${item?.name ?? '?'}» не заполнена зона (поле «Зона (футы)» на листе).`);
+            return;
+        }
+        if (!canvas?.scene) {
+            ui.notifications.warn('Нет активной сцены для размещения зоны.');
+            return;
+        }
+        const existing = canvas.scene.templates.filter(t =>
+            t.flags?.godbound?.zoneItemId === item.id &&
+            t.flags?.godbound?.zoneActorId === this.id);
+        if (existing.length) {
+            await canvas.scene.deleteEmbeddedDocuments('MeasuredTemplate', existing.map(t => t.id));
+            return;
+        }
+        // «на уровень» — множим на уровень персонажа (у НИП — на макс. КЗ).
+        const level = Number(this.system.level) || Number(this.system.hd?.max) || 1;
+        const radius = baseRadius * (cfg.perLevel ? level : 1);
+        const token = this.getActiveTokens()[0];
+        const center = token
+            ? token.center
+            : {x: canvas.stage.pivot.x, y: canvas.stage.pivot.y};
+        const shape = cfg.shape || 'circle';
+        const data = {
+            t: shape,
+            x: center.x,
+            y: center.y,
+            distance: radius,
+            direction: 0,
+            // Едва заметная серая заливка/граница, чтобы зона не мешала игре.
+            fillColor: '#9a9a9a',
+            borderColor: '#8a8a8a',
+            flags: {godbound: {zoneItemId: item.id, zoneActorId: this.id, zoneName: item.name}}
+        };
+        if (shape === 'cone') data.angle = 53.13;
+        if (shape === 'ray') data.width = Number(cfg.width) || 5;
+        if (shape === 'rect') {
+            // rect-шаблон задаётся диагональю: квадрат со стороной radius.
+            data.distance = Math.hypot(radius, radius);
+            data.direction = 45;
+        }
+        await canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [data]);
+    }
+
+    // Create the Attack item described inside a Divine Gift (e.g. «Рука-коса»)
+    // on this actor. Works on unlinked token actors too — the attack lands on
+    // the token's own copy. Skips creation if an attack with the same name is
+    // already present, so the button can be pressed safely any number of times.
+    async addGiftAttack(gift) {
+        const cfg = gift?.system?.attack;
+        if (!cfg?.enabled) {
+            ui.notifications.warn(`У дара «${gift?.name ?? '?'}» не заполнена атака (включите «Дар даёт атаку» на листе дара).`);
+            return null;
+        }
+        const name = (cfg.name || '').trim() || gift.name;
+        const existing = this.items.find(i => i.type === 'attack' && i.name === name);
+        if (existing) {
+            ui.notifications.info(`Атака «${name}» уже есть у ${this.name} — повторно не добавлена.`);
+            return existing;
+        }
+        const [created] = await this.createEmbeddedDocuments('Item', [{
+            name,
+            type: 'attack',
+            img: gift.img,
+            system: {
+                attr: cfg.attr || 'str',
+                hitBonus: Number(cfg.hitBonus) || 0,
+                range: cfg.range || '',
+                area: cfg.area || '',
+                damageRoll: cfg.damageRoll || '',
+                damageBonus: Number(cfg.damageBonus) || 0,
+                magic: !!cfg.magic,
+                damageType: cfg.damageType || 'physical',
+                guaranteedMinDamage: Number(cfg.guaranteedMinDamage) || 0,
+                autoHit: !!cfg.autoHit,
+                maxDamage: !!cfg.maxDamage,
+                areaAttack: !!cfg.areaAttack,
+                notes: `Атака дара «${gift.name}»`
+            }
+        }]);
+        ui.notifications.info(`Атака «${name}» добавлена ${this.name}.`);
+        return created;
+    }
+
     async rollAttack(item) {
         let template = 'systems/godbound/templates/chat/attack-roll-result.html';
         let chatData = {

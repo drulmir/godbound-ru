@@ -173,6 +173,21 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
       $(ev.currentTarget).closest('.item').next('.item-summary').slideToggle(150);
     });
 
+    // Add the attack described in a Divine Gift (e.g. «Рука-коса») to this actor;
+    // duplicate-safe — the actor method skips creation if it already has one.
+    html.find('.gift-attack-add').click(ev => {
+      const li = $(ev.currentTarget).parents('.item');
+      const item = this.actor.items.get(li.data("itemId"));
+      this.actor.addGiftAttack(item);
+    });
+
+    // Spawn/remove the subtle AoE zone template of a power on the current scene.
+    html.find('.aoe-zone-toggle').click(ev => {
+      const li = $(ev.currentTarget).parents('.item');
+      const item = this.actor.items.get(li.data("itemId"));
+      this.actor.toggleAoeZone(item);
+    });
+
     // Single "use" button for powers: commits Effort per the power's settings
     // and posts its description to chat.
     html.find('.power-use').click(ev => {
