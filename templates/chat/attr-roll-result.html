@@ -1,0 +1,23 @@
+<div class="godbound chat-block gb-card gb-card--check {{result.className}}">
+    <h2 class="gb-title"><span class="gb-title__text">{{title}}</span></h2>
+
+    <div class="gb-actor">
+        <div class="gb-portraits">
+            <img class="gb-portrait" src="{{data.actor.img}}" alt="" title="{{data.actor.name}}">
+        </div>
+        <div class="gb-names">
+            <span class="gb-name" title="{{details}}">{{details}}</span>
+            <span class="gb-sub" title="{{data.actor.name}}">{{data.actor.name}}</span>
+        </div>
+    </div>
+
+    <div class="blindable" data-blind="{{data.roll.blindroll}}">
+        {{#if roll}}{{{roll}}}{{/if}}
+        {{#if result.isFailure}}
+        <div class="gb-verdict gb-verdict--bad">Провал <span class="gb-verdict__target">(цель {{result.target}})</span></div>
+        {{/if}}
+        {{#if result.isSuccess}}
+        <div class="gb-verdict gb-verdict--ok">Успех <span class="gb-verdict__target">(цель {{result.target}})</span></div>
+        {{/if}}
+    </div>
+</div>

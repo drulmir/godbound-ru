@@ -1,0 +1,551 @@
+.godbound {
+  /* Sheet Tabs */
+  /* Items List */
+  font-family: 'Palatino Linotype', 'Book Antiqua', Constantia, Georgia, serif;
+}
+.godbound h2, .godbound h3, .godbound h4 {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Constantia, Georgia, serif;
+  letter-spacing: 0.02em;
+}
+.godbound i {
+  cursor: pointer;
+}
+.godbound h3 {
+  font-size: 16px;
+}
+.godbound .container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.godbound .container.row {
+  flex-direction: row;
+  align-items: flex-start;
+}
+.godbound .container.row > * {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+.godbound .container.row > *:first-child {
+  margin-left: 0;
+}
+.godbound .container.row > *:last-child {
+  margin-right: 0;
+}
+.godbound .container.col {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.godbound .container.col > * {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+.godbound .container.col > *:first-child {
+  margin-top: 0;
+}
+.godbound .container.col > *:last-child {
+  margin-bottom: 0;
+}
+.godbound .container > * {
+  flex-grow: 1;
+  width: auto;
+}
+.godbound input,
+.godbound textarea {
+  background: rgba(0, 0, 0, 0.01);
+}
+.godbound input.shares {
+  width: auto;
+}
+.godbound .window-content {
+  height: 100%;
+  padding: 5px;
+  overflow-y: hidden;
+  background: url('/systems/godbound/assets/parchment.jpg');
+}
+.godbound form {
+  background: inherit;
+}
+.godbound .tabular {
+  display: table;
+}
+.godbound .tabular > * {
+  display: table-row;
+}
+.godbound .tabular > * > * {
+  display: table-cell;
+  vertical-align: top;
+}
+.godbound .tabular > * > *:first-child {
+  width: 20%;
+  text-align: right;
+  padding-right: 8px;
+  padding-top: 4px;
+}
+.godbound .tabular > * > *:last-child {
+  width: 100%;
+  margin-bottom: 4px;
+}
+.godbound .tabular > * > div:last-child {
+  padding-bottom: 4px;
+}
+.godbound .profile-img {
+  flex: 0 0 100px;
+  flex-grow: 0;
+  height: 100px;
+  margin-right: 10px;
+}
+.godbound .sheet-header {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 32px;
+}
+.godbound .sheet-header .header-fields {
+  flex: 1;
+  min-width: 0;
+  height: auto;
+}
+/* The old display:table header let cells collapse to content in auto table
+   layout, so width:100% was relative to a tiny cell and every field stayed
+   small. Lay the header out as flex rows instead: a fixed-width label and a
+   control that fills the rest of the row. */
+.godbound.actor .sheet-header .header-fields.tabular {
+  display: block;
+  width: 100%;
+}
+.godbound.actor .sheet-header .header-fields.tabular > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.godbound.actor .sheet-header .header-fields.tabular > div > label:first-child {
+  flex: 0 0 92px;
+  text-align: right;
+  padding-top: 4px;
+}
+.godbound.actor .sheet-header .header-fields.tabular > div > input,
+.godbound.actor .sheet-header .header-fields.tabular > div > textarea,
+.godbound.actor .sheet-header .header-fields.tabular > div > select,
+.godbound.actor .sheet-header .header-fields.tabular > div > div:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.godbound.actor .sheet-header .header-fields.tabular > div > input.compact,
+.godbound.actor .sheet-header .header-fields.tabular > div > input.shares {
+  flex: 0 0 auto;
+}
+.godbound.actor .sheet-header .header-fields.tabular textarea {
+  min-height: 56px;
+  resize: vertical;
+}
+/* Greater gifts/powers get a glowing golden seal before the (italic) name so
+   they stand out at a glance from lesser ones in every list. */
+.godbound .greater-gift {
+  font-style: italic;
+}
+.godbound .greater-gift-badge {
+  color: #d4af37;
+  margin-right: 4px;
+  filter: drop-shadow(0 0 3px rgba(212, 175, 55, 0.95));
+}
+.godbound textarea {
+  font-family: inherit;
+  font-size: inherit;
+  height: 50px;
+}
+.godbound textarea.med {
+  height: 90px;
+}
+.godbound textarea.tall {
+  height: 128px;
+}
+.godbound textarea.xtall {
+  height: 340px;
+}
+.godbound .tabs {
+  position: absolute;
+  transform: rotate(90deg);
+  top: 220px;
+  right: -227px;
+  width: 435px;
+  z-index: -1;
+}
+.godbound .tabs .item {
+  padding: 2px 10px 0;
+  margin-left: -5px;
+  text-indent: 4px;
+  white-space: nowrap;
+  font-weight: bold;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.9);
+  font-size: 12px;
+  filter: brightness(0.9);
+  background: url('/systems/godbound/assets/parchment.jpg');
+}
+.godbound .tabs .item.active {
+  text-decoration: underline;
+  text-shadow: none;
+  filter: brightness(1);
+  z-index: 10;
+}
+.godbound .artifact .tabs {
+  width: 150px;
+  top: 150px;
+  right: -80px;
+}
+.godbound .sheet-body {
+  overflow: hidden;
+}
+.godbound .sheet-body .tab {
+  height: 100%;
+}
+.godbound .sheet-body table {
+  font-size: 14px;
+}
+.godbound .sheet-body table input {
+  width: 24px;
+}
+.godbound .sheet-body table.headered td {
+  text-align: center;
+}
+.godbound .sheet-body table.headered td:first-child {
+  text-align: right;
+  padding-right: 0;
+}
+.godbound .sheet-body table td:first-child {
+  text-align: right;
+  padding-right: 8px;
+}
+.godbound .editor,
+.godbound .editor-content {
+  height: 128px;
+  background: rgba(0, 0, 0, 0.01);
+}
+.godbound .editor {
+  border: 1px solid #000;
+  border-radius: 3px;
+}
+.godbound .item-list {
+  list-style: none;
+  margin: 7px 0;
+  padding: 0;
+  overflow-y: auto;
+}
+.godbound .item-list .item {
+  min-height: 34px;
+  line-height: 24px;
+  padding: 3px 0;
+  border-bottom: 1px solid #BBB;
+  align-items: center;
+}
+.godbound .item-list .item img,
+.godbound .item-list .item img.item-image {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.04);
+  margin-right: 6px;
+}
+.godbound .item-list .item-name {
+  margin: 0;
+  cursor: pointer;
+}
+.godbound .item-list .item-tags {
+  color: darkred;
+  margin-left: 8px;
+}
+.godbound .item-list .item.atwill-highlight {
+  background: rgba(255, 193, 7, 0.18);
+  border-left: 3px solid #d4a017;
+  padding-left: 4px;
+}
+.godbound .item-tags .atwill-icon {
+  color: #d4a017;
+}
+.godbound .item-list .item-controls {
+  flex: 0 0 auto;
+}
+.godbound input.compact {
+  width: 24px;
+}
+.godbound input.compactplus {
+  width: 48px;
+}
+.godbound input.compact[type='button'] {
+  width: 80px;
+}
+.godbound.chat-block {
+  margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+/* Подсветка успеха/провала полностью переехала в styles/gb-chat.css.
+   Прежние заливки (0,3,0) перебивали пергаментный background-color карточки
+   (0,2,0) и проступали неоновым зелёным/красным, пока грузится текстура. */
+.godbound.chat-block h2 {
+  font-size: 18px;
+  line-height: 1.15;
+  text-align: center;
+  margin: 2px 0 4px;
+  border: none;
+  border-bottom: 1px solid #bbb;
+  padding-bottom: 2px;
+  font-weight: bold;
+}
+.godbound.chat-block h3 {
+  line-height: 1.2;
+}
+.godbound.chat-block .chat-actor {
+  min-height: 46px;
+  margin: 4px 0;
+  border-bottom: 1px solid #aaa;
+  color: black;
+  padding: 2px;
+  box-shadow: 0 0 2px #fff inset;
+  align-items: center;
+}
+.godbound.chat-block .chat-actor .chat-title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.godbound.chat-block .chat-actor .chat-title h3 {
+  border: none;
+  margin: 0 0 0 4px;
+  font-size: 14px;
+  line-height: 1.15;
+}
+.godbound.chat-block .chat-img {
+  flex: 0 0 42px;
+  background-size: cover;
+}
+.godbound.chat-block .chat-target {
+  text-align: right;
+  font-style: italic;
+  padding: 2px;
+}
+.godbound.chat-block .chat-details {
+  padding: 4px;
+  font-size: 13px;
+}
+.godbound.chat-block .roll-result {
+  font-size: 16px;
+  text-align: center;
+  margin-top: 4px;
+}
+.godbound.chat-block .roll-result.roll-success {
+  color: #18520b;
+}
+.godbound.chat-block .roll-result.roll-fail {
+  color: #aa0200;
+}
+.godbound.chat-block .damage-formula-roll,
+.godbound.chat-block .instant-auto-save {
+  text-decoration: underline;
+  cursor: pointer;
+  color: darkred;
+}
+.godbound .quick-damage-btn,
+.godbound .quick-heal-btn {
+  cursor: pointer;
+  margin-left: 4px;
+}
+.godbound .quick-damage-btn {
+  color: darkred;
+}
+.godbound .quick-heal-btn {
+  color: darkgreen;
+}
+.godbound .roll-tactic-btn {
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+}
+.godbound.chat-block .apply-damage-btn.used {
+  background: #4caf50;
+  color: white;
+  border-color: #2e7031;
+}
+.godbound.chat-block .power-description {
+  font-family: serif;
+}
+.godbound.sheet.actor {
+  min-width: 560px;
+  min-height: 420px;
+}
+.godbound.sheet.item {
+  min-width: 460px;
+  min-height: 240px;
+}
+/* ============================================================
+   Ornate parchment theme for actor sheets — COSMETIC ONLY.
+   No layout/DOM changes: only colours, frames, section titles,
+   the portrait ring, field styling and tab colours. Scoped to
+   .godbound.actor so item sheets are untouched.
+   ============================================================ */
+.godbound.actor {
+  --gb-ink: #3a2a18;
+  --gb-gold: #b8860b;
+  --gb-gold-dark: #8a6d1f;
+  --gb-line: #b9a06a;
+  --gb-panel: rgba(255, 249, 233, 0.55);
+}
+
+/* Warm ink colour + a layered inset frame around the whole sheet. */
+.godbound.actor .window-content {
+  color: var(--gb-ink);
+  padding-top: 24px;
+  box-shadow: inset 0 0 0 2px rgba(120, 90, 45, 0.55),
+              inset 0 0 0 4px rgba(160, 125, 60, 0.35),
+              inset 0 0 22px rgba(80, 55, 20, 0.28);
+}
+
+/* Section sub-headers (Характеристики / Спасброски / Защита …): centred,
+   small-caps, gold, flanked by short decorative rules. */
+.godbound.actor .sheet-body h3 {
+  color: var(--gb-gold-dark);
+  text-align: center;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+.godbound.actor .sheet-body h3::before,
+.godbound.actor .sheet-body h3::after {
+  content: "";
+  display: inline-block;
+  width: 26px;
+  height: 1px;
+  vertical-align: middle;
+  margin: 0 8px;
+  background: var(--gb-line);
+}
+
+/* Group headers with an add-button (h2) keep their flex layout but get the theme. */
+.godbound.actor .sheet-body h2 {
+  color: var(--gb-gold-dark);
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--gb-line);
+  padding-bottom: 2px;
+}
+
+/* Fields: cream panels with a soft sepia edge and a gold focus glow. */
+.godbound.actor input[type="text"],
+.godbound.actor input[type="number"],
+.godbound.actor textarea,
+.godbound.actor select {
+  background: var(--gb-panel);
+  border: 1px solid var(--gb-line);
+  border-radius: 3px;
+  color: var(--gb-ink);
+}
+.godbound.actor input[type="text"]:focus,
+.godbound.actor input[type="number"]:focus,
+.godbound.actor textarea:focus,
+.godbound.actor select:focus {
+  border-color: var(--gb-gold);
+  box-shadow: 0 0 4px rgba(184, 134, 11, 0.55);
+  outline: none;
+}
+
+/* Portrait: gilded medallion ring. */
+.godbound.actor .profile-img {
+  border: 3px solid var(--gb-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #5b4420, 0 2px 7px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+  background: #efe6cf;
+}
+
+/* Stat tables become framed panels with a headed row. */
+.godbound.actor .sheet-body table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--gb-line);
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(255, 250, 235, 0.35);
+}
+.godbound.actor .sheet-body table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid rgba(185, 160, 106, 0.4);
+}
+.godbound.actor .sheet-body table tr:last-child td {
+  border-bottom: none;
+}
+.godbound.actor .sheet-body table.headered thead td,
+.godbound.actor .sheet-body table.headered thead th {
+  text-align: center;
+}
+
+/* Item list rows: warmer separators + a gentle hover. */
+.godbound.actor .item-list .item {
+  border-bottom: 1px solid rgba(160, 125, 60, 0.35);
+}
+.godbound.actor .item-list .item:hover {
+  background: rgba(184, 134, 11, 0.08);
+}
+
+/* Buttons (Новый день, действия фракции …): parchment with a sepia edge. */
+.godbound.actor input[type="button"],
+.godbound.actor button {
+  background: linear-gradient(180deg, rgba(245, 235, 210, 0.9), rgba(214, 197, 158, 0.9));
+  border: 1px solid var(--gb-gold-dark);
+  border-radius: 4px;
+  color: var(--gb-ink);
+  font-variant: small-caps;
+  font-weight: bold;
+  cursor: pointer;
+}
+.godbound.actor input[type="button"]:hover,
+.godbound.actor button:hover {
+  background: linear-gradient(180deg, rgba(250, 242, 222, 1), rgba(224, 207, 168, 1));
+  box-shadow: 0 0 4px rgba(184, 134, 11, 0.5);
+}
+
+/* Tabs keep their existing position; just richer colours + a clear active state. */
+.godbound.actor .tabs .item {
+  color: #6b5327;
+  border: 1px solid var(--gb-gold-dark);
+  border-radius: 4px;
+}
+.godbound.actor .tabs .item.active {
+  color: var(--gb-gold-dark);
+  filter: brightness(1.05);
+  box-shadow: 0 0 6px 1px rgba(184, 134, 11, 0.6);
+}
+
+/* ---- Layout-faithful touches (portrait left + framed "windows") ---- */
+
+/* Portrait to the LEFT of the header — visual reorder only, DOM untouched.
+   The portrait wrapper is the header's last child; order:-1 floats it first. */
+.godbound.actor .container.row.sheet-header > div:last-child {
+  order: -1;
+  margin-right: 14px;
+  margin-top: 6px;
+}
+
+/* Framed section "windows": a beautiful near-black frame with a thin gold
+   inner line, matching the reference sheet. */
+.godbound.actor .gb-panel {
+  border: 2px solid #241a10;
+  border-radius: 6px;
+  padding: 4px 10px 8px;
+  background: rgba(255, 250, 235, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(184, 134, 11, 0.45),
+              0 1px 4px rgba(0, 0, 0, 0.4);
+}
+/* Inside a panel the table drops its own frame — the panel IS the frame. */
+.godbound.actor .gb-panel table {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.godbound.actor .gb-panel h3 {
+  margin-top: 2px;
+}

@@ -1,0 +1,951 @@
+<form class="{{cssClass}}" autocomplete="off" style="overflow-y:scroll;">
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="attrs">Хар-ки</a>
+        <a class="item" data-tab="divine">Божественное</a>
+        <a class="item" data-tab="arts">Искусства</a>
+        <a class="item" data-tab="passives">Пассивки</a>
+        <a class="item" data-tab="combat">Бой</a>
+        <a class="item" data-tab="wealth">Богатство</a>
+        <a class="item" data-tab="artifacts">Артефакты</a>
+        <a class="item" data-tab="projects">Проекты</a>
+        <a class="item" data-tab="notes" style="flex-grow:2">Факты</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        <div class="tab attrs" data-group="primary" data-tab="attrs">
+            <div class="container col">
+
+                <div class="container row sheet-header">
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label> <input id="name" name="name" type="text" value="{{actor.name}}"/>
+                        </div>
+                        <div>
+                            <label for="description">Описание:</label> <textarea id="description" name="system.description" class="med">{{system.description}}</textarea>
+                        </div>
+                        <div>
+                            <label for="goal">Цели:</label> <textarea id="goal" name="system.goal" class="med">{{system.goal}}</textarea>
+                        </div>
+                        <div>
+                            <label for="level">Уровень:</label>
+                            <div>
+                                <input id="level" name="system.level" type="text" value="{{system.level}}" class="shares"/>
+                                <label for="xp" style="padding-left:16px">Опыт:</label>
+                                <input id="xp" name="system.xp" type="text" value="{{system.xp}}" class="shares"/>
+                            </div>
+                        </div>
+                        <div>
+
+                        </div>
+                    </div>
+                    <div style="position:relative; flex: 0 0 100px;">
+                        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100"
+                             width="100"/>
+                        <a class="token-image-share" title="Показать всем игрокам по центру экрана" style="position:absolute; bottom:2px; right:2px; background:rgba(255,255,255,0.85); border-radius:50%; width:22px; height:22px; text-align:center; line-height:22px;"><i class="fas fa-eye" style="color:#000;"></i></a>
+                    </div>
+                </div>
+
+                <div class="container row">
+                    <div class="container col">
+                        <div class="gb-panel">
+                            <h3>Характеристики</h3>
+                            <table class="headered">
+                                <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>Знач</td>
+                                    <td>Мод</td>
+                                    <td>Проверка</td>
+                                    <td>Бросок</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Сил</td>
+                                    <td><input type="text" name="system.attributes.str.score" value="{{system.attributes.str.score}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.attributes.str.mod}}</td>
+                                    <td>{{system.computed.attributes.str.check}}</td>
+                                    <td><a class="attr-roll" title="Бросок" data-attr="str"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Лов</td>
+                                    <td><input type="text" name="system.attributes.dex.score" value="{{system.attributes.dex.score}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.attributes.dex.mod}}</td>
+                                    <td>{{system.computed.attributes.dex.check}}</td>
+                                    <td><a class="attr-roll" title="Бросок" data-attr="dex"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Тел</td>
+                                    <td><input type="text" name="system.attributes.con.score" value="{{system.attributes.con.score}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.attributes.con.mod}}</td>
+                                    <td>{{system.computed.attributes.con.check}}</td>
+                                    <td><a class="attr-roll" title="Бросок" data-attr="con"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Инт</td>
+                                    <td><input type="text" name="system.attributes.int.score" value="{{system.attributes.int.score}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.attributes.int.mod}}</td>
+                                    <td>{{system.computed.attributes.int.check}}</td>
+                                    <td><a class="attr-roll" title="Бросок" data-attr="int"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Мдр</td>
+                                    <td><input type="text" name="system.attributes.wis.score" value="{{system.attributes.wis.score}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.attributes.wis.mod}}</td>
+                                    <td>{{system.computed.attributes.wis.check}}</td>
+                                    <td><a class="attr-roll" title="Бросок" data-attr="wis"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Хар</td>
+                                    <td><input type="text" name="system.attributes.cha.score" value="{{system.attributes.cha.score}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.attributes.cha.mod}}</td>
+                                    <td>{{system.computed.attributes.cha.check}}</td>
+                                    <td><a class="attr-roll" title="Бросок" data-attr="cha"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="container col">
+                        <div class="gb-panel">
+                            <h3>Спасброски</h3>
+                            <table class="headered">
+                                <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>База</td>
+                                    <td>Бонус</td>
+                                    <td>Штраф</td>
+                                    <td>Бросок</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Стойкость</td>
+                                    <td>{{system.computed.saves.hardiness.base}}</td>
+                                    <td><input type="text" name="system.saves.hardiness.bonus" value="{{system.saves.hardiness.bonus}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.saves.hardiness.penalty}}</td>
+                                    <td><a class="save-roll" title="Бросок" data-save="hardiness"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Уклонение</td>
+                                    <td>{{system.computed.saves.evasion.base}}</td>
+                                    <td><input type="text" name="system.saves.evasion.bonus" value="{{system.saves.evasion.bonus}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.saves.evasion.penalty}}</td>
+                                    <td><a class="save-roll" title="Бросок" data-save="evasion"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Дух</td>
+                                    <td>{{system.computed.saves.spirit.base}}</td>
+                                    <td><input type="text" name="system.saves.spirit.bonus" value="{{system.saves.spirit.bonus}}" data-dtype="Number" /></td>
+                                    <td>{{system.computed.saves.spirit.penalty}}</td>
+                                    <td><a class="save-roll" title="Бросок" data-save="spirit"><i class="fas fa-dice-d20"></i></a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="gb-panel">
+                            <h3>Защита</h3>
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td style="width:30%">Текущие ОЗ</td>
+                                    <td style="width:20%; padding-left:4px;">{{system.hp.current}}</td>
+                                    <td style="width:10%">КБ</td>
+                                    <td>{{system.computed.armor.ac}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Бонусные ОЗ</td>
+                                    <td colspan="3" style="padding-left:4px;">{{system.hp.bonus}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Макс. ОЗ</td>
+                                    <td colspan="3" style="padding-left: 4px;">{{system.computed.hp.max}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Урон/Лечение</td>
+                                    <td colspan="3" style="padding-left:4px;">
+                                        <input type="text" class="quick-hp-amount compact" value="0" data-dtype="Number" style="width:40px;"/>
+                                        <a class="quick-damage-btn" data-actor-id="{{actor.id}}" title="Нанести урон"><i class="fas fa-tint"></i></a>
+                                        <a class="quick-heal-btn" data-actor-id="{{actor.id}}" title="Вылечить"><i class="fas fa-heart"></i></a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td title="Активируется при 0 ОЗ: лечение до ½ макс. ОЗ, +Усилие=уровню, освобождение от связывающей магии. Одна на уровень — возвращается при получении нового уровня. Изменять запас может только Ведущий.">Бож. ярость</td>
+                                    <td colspan="3" style="padding-left:4px;">
+                                        <span title="Осталось использований Божественной ярости">Осталось:</span>
+                                        <input type="text" name="system.divineFury.remaining" value="{{system.computed.divineFury.remaining}}"
+                                               data-dtype="Number" style="width:3em;text-align:center;margin:0 4px;"
+                                               {{#unless @root.isGM}}disabled title="Изменять может только Ведущий"{{/unless}}/>
+                                        {{#if system.computed.divineFury.available}}<b style="color:#178217;">Доступна</b>{{else}}<span style="opacity:0.7;">Исчерпана</span>{{/if}}
+                                        {{#unless system.hp.current}}
+                                        {{#if system.computed.divineFury.available}}
+                                        <a class="divine-fury-activate" data-actor-id="{{actor.id}}" title="Активировать Божественную ярость" style="margin-left:10px;color:#b00;font-weight:bold;"><i class="fas fa-bolt"></i> Активировать</a>
+                                        {{/if}}
+                                        {{/unless}}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tab divine" data-group="primary" data-tab="divine">
+            <div class="container col" style="padding-bottom: 16px;">
+                <h2>Ресурсы</h2>
+                <table class="headered">
+                    <thead>
+                        <tr>
+                            <td></td>
+                            <td>Всего</td>
+                            <td>Задействовано</td>
+                            <td>Свободно</td>
+                            <td>Доход</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Усилие</td>
+                            <td><input type="text" data-dtype="Number" name="system.effort.total" value="{{system.effort.total}}" /></td>
+                            <td>{{system.computed.effort.spent}}</td>
+                            <td>{{system.computed.effort.available}}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Влияние</td>
+                            <td><input type="text" data-dtype="Number" name="system.influence.total" value="{{system.influence.total}}" /></td>
+                            <td>{{system.computed.influence.spent}}</td>
+                            <td>{{system.computed.influence.available}}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Домино</td>
+                            <td><input type="text" data-dtype="Number" name="system.dominion.total" value="{{system.dominion.total}}" /></td>
+                            <td>{{system.computed.dominion.spent}}</td>
+                            <td>{{system.computed.dominion.available}}</td>
+                            <td>{{system.computed.dominion.income}}</td>
+                        </tr>
+                        <tr>
+                            <td>Очки Даров</td>
+                            <td><input type="text" data-dtype="Number" name="system.giftPoints.total" value="{{system.giftPoints.total}}" title="Всего доступных очков Даров" /></td>
+                            <td title="3 за Слово, 2 за Большой Дар, 1 за Малый Дар">{{system.computed.giftPoints.spent}}</td>
+                            <td>{{system.computed.giftPoints.available}}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="container row" style="justify-content:flex-end;">
+                    <input type="button" class="reset-scene" value="Восстановить (сцена)" />
+                    <input type="button" class="reset-day" value="Новый день (отдых + лечение)" />
+                </div>
+                <div class="container row" style="margin-left: auto; margin-right: auto; font-size: 16px; flex-wrap: wrap; gap: 6px 24px; justify-content: center;">
+                    <div style="white-space: nowrap;">
+                        <span style="padding-right: 4px;">По желанию:</span>
+                        <i class="fas fa-minus effortSpend" data-effort-category="atWill" data-effort-change="-1"></i>
+                        {{system.effort.atWill}}
+                        <i class="fas fa-plus effortSpend" data-effort-category="atWill" data-effort-change="1"></i>
+                    </div>
+                    <div style="white-space: nowrap;">
+                        <span style="padding-right: 4px;">Сцена:</span>
+                        <i class="fas fa-minus effortSpend" data-effort-category="scene" data-effort-change="-1"></i>
+                        {{system.effort.scene}}
+                        <i class="fas fa-plus effortSpend" data-effort-category="scene" data-effort-change="1"></i>
+                    </div>
+                    <div style="white-space: nowrap;">
+                        <span style="padding-right: 4px;">День:</span>
+                        <i class="fas fa-minus effortSpend" data-effort-category="day" data-effort-change="-1"></i>
+                        {{system.effort.day}}
+                        <i class="fas fa-plus effortSpend" data-effort-category="day" data-effort-change="1"></i>
+                    </div>
+                    <div style="white-space: nowrap;" title="Исцеление: каждое самолечение стоит 1 Усилия, приложенного до конца дня (отдых возвращает).">
+                        <span style="padding-right: 4px;"><i class="fas fa-heart" style="color:#c0392b;"></i> Исцеление:</span>
+                        <i class="fas fa-minus effortSpend" data-effort-category="healing" data-effort-change="-1"></i>
+                        {{#if system.effort.healing}}{{system.effort.healing}}{{else}}0{{/if}}
+                        <i class="fas fa-plus effortSpend" data-effort-category="healing" data-effort-change="1"></i>
+                    </div>
+                    <div style="white-space: nowrap;">
+                        <a class="effort-release" title="Показать, куда вложено Усилие, и вернуть его">
+                            <i class="fas fa-rotate-left"></i> Вернуть…
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="container row" style="margin-top: 24px;">
+                <div class="container col" style="width:50%;">
+                    <div class="container col">
+                        <h2 style="display:flex;justify-content: space-between;">
+                            <span>Слова</span>
+                            <i class="fas fa-plus itemAdder" data-item-type="boundWord"></i>
+                        </h2>
+                        <ol class="item-list">
+                            {{#each actor.items as |item id|}}
+                            {{#ifeq item.type "boundWord"}}
+                            <li class="item flexrow" data-item-id="{{item.id}}">
+                                <img class="item-image" src="{{item.img}}" title="{{item.name}}" />
+                                <h4 class="item-name">
+                                    {{item.name}}
+                                    <span class="item-tags" title="Потрачено Усилий на это Слово">(Усилие {{item.system.computed.effortSpent}})</span>
+                                </h4>
+                                <div class="item-controls">
+                                    <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                    <a class="item-control word-use" title="Использовать Слово (приложить Усилие)"><i class="fas fa-hand-sparkles"></i></a>
+                                    <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
+                                </div>
+                            </li>
+                            <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                            {{/ifeq}}
+                            {{/each}}
+                        </ol>
+                    </div>
+                    <div class="container col">
+                        <h2 style="display:flex;justify-content: space-between;">
+                            <span>Чудеса</span>
+                            <i class="fas fa-plus itemAdder" data-item-type="divineMiracle"></i>
+                        </h2>
+                        <ol class="item-list">
+                            {{#each actor.items as |item id|}}
+                            {{#ifeq item.type "divineMiracle"}}
+                            <li class="item flexrow {{#if item.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{item.id}}">
+                                <h4 class="item-name">
+                                    {{item.name}}
+                                    <span class="item-tags">
+                                    {{#if item.system.atWill}}
+                                        <a title="По желанию"><i class="fas fa-star atwill-icon"></i></a>
+                                    {{/if}}
+                                    {{#if item.system.instant}}
+                                        <a title="Мгновенно"><i class="fas fa-bolt"></i></a>
+                                    {{/if}}
+                                    {{#if item.system.onTurn}}
+                                        <a title="В свой ход"><i class="fas fa-redo-alt"></i></a>
+                                    {{/if}}
+                                    {{#if item.system.action}}
+                                        <a title="Действие"><i class="fas fa-hourglass-end"></i></a>
+                                    {{/if}}
+                                    {{#if item.system.smite}}
+                                        <a title="Кара"><i class="fas fa-meteor"></i></a>
+                                    {{/if}}
+                                    </span>
+                                </h4>
+                                <div class="item-controls">
+                                    {{#if item.system.computed.effortHeld}}<a class="item-control item-effort-return" title="Приложено Усилия: {{item.system.computed.effortHeld}} (По желанию {{item.system.effort.atWill}} · Сцена {{item.system.effort.scene}} · День {{item.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{item.system.computed.effortHeld}}</a>{{/if}}
+                                    <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                    <a class="item-control power-use" title="Использовать (приложить Усилие и вывести в чат)"><i class="fas fa-hand-sparkles"></i></a>
+                                </div>
+                            </li>
+                            <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                            {{/ifeq}}
+                            {{/each}}
+                        </ol>
+                    </div>
+                </div>
+                <div class="container col" style="width:50%;">
+                    <h2 style="display:flex;justify-content: space-between;">
+                        <span>Дары</span>
+                        <i class="fas fa-plus itemAdder" data-item-type="divineGift"></i>
+                    </h2>
+                    <ol class="item-list">
+                        {{#each actor.items as |item id|}}
+                        {{#ifeq item.type "divineGift"}}
+                        <li class="item flexrow {{#if item.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{item.id}}">
+                            <img class="item-image" src="{{item.img}}" title="{{item.name}}" />
+                            <h4 class="item-name">
+                                {{#if item.system.greater}}
+                                    <span class="greater-gift"><i class="fas fa-certificate greater-gift-badge" title="Больший дар"></i>{{item.name}}</span>
+                                {{/if}}
+                                {{#unless item.system.greater}}
+                                    {{item.name}}
+                                {{/unless}}
+                                <span class="item-tags">
+                                {{#if item.system.atWill}}
+                                    <a title="По желанию"><i class="fas fa-star atwill-icon"></i></a>
+                                {{/if}}
+                                {{#if item.system.instant}}
+                                    <a title="Мгновенно"><i class="fas fa-bolt"></i></a>
+                                {{/if}}
+                                {{#if item.system.onTurn}}
+                                    <a title="В свой ход"><i class="fas fa-redo-alt"></i></a>
+                                {{/if}}
+                                {{#if item.system.action}}
+                                    <a title="Действие"><i class="fas fa-hourglass-end"></i></a>
+                                {{/if}}
+                                {{#if item.system.smite}}
+                                    <a title="Кара"><i class="fas fa-meteor"></i></a>
+                                {{/if}}
+                                </span>
+                            </h4>
+                            <div class="item-controls">
+                                {{#if item.system.computed.effortHeld}}<a class="item-control item-effort-return" title="Приложено Усилия: {{item.system.computed.effortHeld}} (По желанию {{item.system.effort.atWill}} · Сцена {{item.system.effort.scene}} · День {{item.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{item.system.computed.effortHeld}}</a>{{/if}}
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                <a class="item-control power-use" title="Использовать (приложить Усилие и вывести в чат)"><i class="fas fa-hand-sparkles"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                        {{/ifeq}}
+                        {{/each}}
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab arts" data-group="primary" data-tab="arts">
+            <div class="container col">
+
+                {{#each artCategories as |cat id|}}
+                <div class="container col" style="margin-top:16px;">
+                    <h2 style="display:flex;justify-content: space-between;">
+                        <span>{{cat.name}}</span>
+                        <i class="fas fa-plus itemAdder" data-item-type="art" data-item-category="{{cat.id}}" title="Добавить Искусство"></i>
+                    </h2>
+                    <ol class="item-list">
+                        {{#each cat.entries as |entry id|}}
+                        <li class="item flexrow {{#if entry.item.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{entry.item.id}}">
+                            <img class="item-image" src="{{entry.item.img}}" title="{{entry.item.name}}" />
+                            <h4 class="item-name">{{entry.item.name}}{{#if entry.item.system.atWill}} <span class="item-tags"><a title="По желанию"><i class="fas fa-star atwill-icon"></i></a></span>{{/if}}</h4>
+                            <div class="item-controls">
+                                {{#if entry.item.system.computed.effortHeld}}<a class="item-control item-effort-return" title="Приложено Усилия: {{entry.item.system.computed.effortHeld}} (По желанию {{entry.item.system.effort.atWill}} · Сцена {{entry.item.system.effort.scene}} · День {{entry.item.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{entry.item.system.computed.effortHeld}}</a>{{/if}}
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                {{#ifeq entry.item.system.effectType "attack"}}
+                                <a class="item-control art-effect-roll" title="Бросок атаки"><i class="fas fa-dice-d20"></i></a>
+                                {{/ifeq}}
+                                {{#ifeq entry.item.system.effectType "save"}}
+                                <a class="item-control art-effect-roll" title="Спасбросок / урон"><i class="fas fa-shield-alt"></i></a>
+                                {{/ifeq}}
+                                {{#if entry.item.system.usable}}
+                                <a class="item-control power-use" title="Использовать (приложить Усилие и вывести в чат)"><i class="fas fa-hand-sparkles"></i></a>
+                                {{/if}}
+                                <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control itemAdder" data-item-type="artLevel" data-art-id="{{entry.item.id}}" title="Добавить уровень"><i class="fas fa-plus"></i></a>
+                                <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{entry.item.system.description}}</li>
+                        {{#each entry.levels as |lvl id|}}
+                        <li class="item flexrow {{#if lvl.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{lvl.id}}">
+                            <img class="item-image" src="{{lvl.img}}" title="{{lvl.name}}" style="margin-left:16px;" />
+                            <h4 class="item-name">
+                                {{lvl.name}}
+                                <span class="item-tags">
+                                    <a title="Уровень">Lvl {{lvl.system.level}}</a>
+                                    {{#if lvl.system.atWill}}<a title="По желанию"><i class="fas fa-star atwill-icon"></i></a>{{/if}}
+                                    {{#if lvl.system.instant}}<a title="Мгновенно"><i class="fas fa-bolt"></i></a>{{/if}}
+                                    {{#if lvl.system.onTurn}}<a title="В свой ход"><i class="fas fa-redo-alt"></i></a>{{/if}}
+                                    {{#if lvl.system.action}}<a title="Действие"><i class="fas fa-hourglass-end"></i></a>{{/if}}
+                                    {{#if lvl.system.smite}}<a title="Кара"><i class="fas fa-meteor"></i></a>{{/if}}
+                                </span>
+                            </h4>
+                            <div class="item-controls">
+                                {{#if lvl.system.computed.effortHeld}}<a class="item-control item-effort-return" title="Приложено Усилия: {{lvl.system.computed.effortHeld}} (По желанию {{lvl.system.effort.atWill}} · Сцена {{lvl.system.effort.scene}} · День {{lvl.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{lvl.system.computed.effortHeld}}</a>{{/if}}
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                {{#ifeq lvl.system.effectType "attack"}}
+                                <a class="item-control art-effect-roll" title="Бросок атаки"><i class="fas fa-dice-d20"></i></a>
+                                {{/ifeq}}
+                                {{#ifeq lvl.system.effectType "save"}}
+                                <a class="item-control art-effect-roll" title="Спасбросок / урон"><i class="fas fa-shield-alt"></i></a>
+                                {{/ifeq}}
+                                {{#if lvl.system.usable}}
+                                <a class="item-control power-use" title="Использовать (приложить Усилие и вывести в чат)"><i class="fas fa-hand-sparkles"></i></a>
+                                {{/if}}
+                                <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px 16px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{lvl.system.description}}</li>
+                        {{/each}}
+                        {{/each}}
+                    </ol>
+                </div>
+                {{/each}}
+
+            </div>
+        </div>
+
+        <div class="tab notes" data-group="primary" data-tab="notes">
+            <div class="container col">
+                <div class="container col">
+                    <h2 style="display:flex;justify-content: space-between;">
+                        <span>Факты</span>
+                        <i class="fas fa-plus itemAdder" data-item-type="fact"></i>
+                    </h2>
+                    <ol class="item-list">
+                        {{#each actor.items as |item id|}}
+                        {{#ifeq item.type "fact"}}
+                        <li class="item flexrow" data-item-id="{{item.id}}">
+                            <h4 class="item-name">{{item.name}}</h4>
+                            <div class="item-controls">
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                <a class="item-control item-chat" title="Отправить в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                        {{/ifeq}}
+                        {{/each}}
+                    </ol>
+                </div>
+                <div class="container col" style="margin-top:24px;">
+                    <h2 style="display:flex;justify-content: space-between;">
+                        <span>Языки</span>
+                        <i class="fas fa-plus itemAdder" data-item-type="language"></i>
+                    </h2>
+                    <ol class="item-list">
+                        {{#each actor.items as |item id|}}
+                        {{#ifeq item.type "language"}}
+                        <li class="item flexrow" data-item-id="{{item.id}}">
+                            <h4 class="item-name">{{item.name}}</h4>
+                            <div class="item-controls">
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                <a class="item-control item-chat" title="Отправить в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                        {{/ifeq}}
+                        {{/each}}
+                    </ol>
+                </div>
+                <div style="margin-top:24px;">
+                    <h3>Заметки:</h3>
+                    <textarea name="system.notes" style="height:128px;font-size:14px">{{system.notes}}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab passives" data-group="primary" data-tab="passives">
+            <div class="container col">
+                <h2>Пассивные эффекты</h2>
+                <div class="container row" style="margin-bottom:12px;">
+                    <div><b>Снижение урона:</b> {{system.computed.passives.reduction}}</div>
+                </div>
+                <div class="container row" style="margin-bottom:12px;">
+                    <div><b>Иммунитет:</b>
+                        {{#each system.computed.passives.immune}}<span class="item-tags"><a>{{dmgType this}}</a></span>{{/each}}
+                        {{#unless system.computed.passives.immune.length}}—{{/unless}}
+                    </div>
+                </div>
+                <div class="container row" style="margin-bottom:12px;">
+                    <div><b>Сопротивление:</b>
+                        {{#each system.computed.passives.resistant}}<span class="item-tags"><a>{{dmgType this}}</a></span>{{/each}}
+                        {{#unless system.computed.passives.resistant.length}}—{{/unless}}
+                    </div>
+                </div>
+                <div class="container row" style="margin-bottom:12px;">
+                    <div><b>Уязвимость:</b>
+                        {{#each system.computed.passives.vulnerable}}<span class="item-tags"><a>{{dmgType this}}</a></span>{{/each}}
+                        {{#unless system.computed.passives.vulnerable.length}}—{{/unless}}
+                    </div>
+                </div>
+                <h3>Источники:</h3>
+                <ol class="item-list">
+                    {{#each system.computed.passives.list as |p id|}}
+                    <li class="item flexrow">
+                        <h4 class="item-name">{{p.name}}</h4>
+                        <span class="item-tags">
+                            {{#if p.reduction}}<a title="Снижение урона">-{{p.reduction}}</a>{{/if}}
+                            {{#each p.immune}}<a title="Иммунитет">Имм: {{dmgType this}}</a>{{/each}}
+                            {{#each p.resistant}}<a title="Сопротивление">Соп: {{dmgType this}}</a>{{/each}}
+                            {{#each p.vulnerable}}<a title="Уязвимость">Уязв: {{dmgType this}}</a>{{/each}}
+                        </span>
+                    </li>
+                    {{/each}}
+                    {{#unless system.computed.passives.list.length}}
+                    <li>Нет активных пассивных эффектов от даров или слов.</li>
+                    {{/unless}}
+                </ol>
+            </div>
+        </div>
+
+        <div class="tab combat" data-group="primary" data-tab="combat">
+            <div class="container col">
+                <h2>
+                    Броня
+                </h2>
+                <select name="system.armor.type" id="armorType">
+                    {{#select system.armor.type}}
+                    <option value="none">Нет КБ 9 (кожа или одежда)</option>
+                    <option value="light">Лёгкий КБ 7 (кожа или шкуры)</option>
+                    <option value="medium">Средний КБ 5 (кольчуга/лёгкие латы; -4 к 1 спасброску)</option>
+                    <option value="heavy">Тяжёлый КБ 3 (тяж. латы; -4 к 2 спасброскам)</option>
+                    <option value="divine">Божественный Дар (КБ 3)</option>
+                    {{/select}}
+                </select>
+                <div style="display:flex;align-items:center;justify-content: flex-start">
+                    <input id="armorShield" type="checkbox" name="system.armor.shield" {{checked system.armor.shield}} style="margin-right:0" />
+                    <label for="armorShield">Щит</label>
+
+                    <select name="system.armor.attribute" id="armorAttribute"  style="margin-left:16px" >
+                        {{#select system.armor.attribute}}
+                        <option value="str">Сил</option>
+                        <option value="dex">Лов</option>
+                        <option value="con">Тел</option>
+                        <option value="int">Инт</option>
+                        <option value="wis">Мдр</option>
+                        <option value="cha">Хар</option>
+                        {{/select}}
+                    </select>
+
+                    <label for="armorBonus"  style="margin-left:16px" >Бонус</label>
+                    <input id="armorBonus" type="text" name="system.armor.bonus" value="{{system.armor.bonus}}" data-dtype="Number" class="compact" style="margin-left:4px;"/>
+
+                    <label  style="margin-left:16px;margin-right:4px;font-weight:bold;" >КБ</label> <span style="font-weight:bold">{{system.computed.armor.ac}}</span>
+
+                    <input id="penalizeHardiness" type="checkbox" name="system.armor.penalizeHardiness" {{checked system.armor.penalizeHardiness}} style="margin-left:32px;margin-right:0" />
+                    <label for="penalizeHardiness">-Стойкость</label>
+                    <input id="penalizeEvasion" type="checkbox" name="system.armor.penalizeEvasion" {{checked system.armor.penalizeEvasion}} style="margin-left:16px;margin-right:0" />
+                    <label for="penalizeEvasion">-Уклонение</label>
+                    <input id="penalizeSpirit" type="checkbox" name="system.armor.penalizeSpirit" {{checked system.armor.penalizeSpirit}} style="margin-left:16px;margin-right:0" />
+                    <label for="penalizeSpirit">-Дух</label>
+
+                </div>
+            </div>
+            <div class="container col" style="margin-top:16px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <input type="button" class="fray-roll" value="Схватка (Кость Схватки)"
+                           title="Выделите одну цель (Target) и нажмите: авто-попадание Костью Схватки по НИП с HD ниже вашего уровня. Урон применяется вручную из чата, как обычная атака." />
+                    <span style="font-size:12px;opacity:0.8;">Раз в раунд · одна цель (Target) с HD ниже вашего уровня.</span>
+                </div>
+            </div>
+            <div class="container row" style="margin-top:32px;">
+                <div class="container col" style="width:50%;">
+                    <div class="container col">
+                        <h2 style="display:flex;justify-content: space-between;">
+                            <span>Атаки</span>
+                            <i class="fas fa-plus itemAdder" data-item-type="attack"></i>
+                        </h2>
+                        <ol class="item-list">
+                            {{#each actor.items as |item id|}}
+                            {{#ifeq item.type "attack"}}
+                            <li class="item flexrow" data-item-id="{{item.id}}">
+                                <img class="item-image" src="{{item.img}}" title="{{item.name}}" />
+                                <h4 class="item-name">
+                                    {{#if item.system.magic}}
+                                    {{item.name}}*
+                                    {{/if}}
+                                    {{#unless item.system.magic}}
+                                    {{item.name}}
+                                    {{/unless}}
+                                    <span class="item-tags">
+                                    {{#ifneq item.system.hitBonus 0}}
+                                        +{{item.system.hitBonus}}
+                                    {{/ifneq}}
+                                    {{#ifneq item.system.damageBonus 0}}
+                                        {{item.system.damageRoll}}+{{item.system.damageBonus}}
+                                    {{/ifneq}}
+                                    {{#ifeq item.system.damageBonus 0}}
+                                        {{item.system.damageRoll}}
+                                    {{/ifeq}}
+                                    </span>
+                                </h4>
+                                <div class="item-controls">
+                                    <a class="attack-roll" title="Бросок"><i class="fas fa-dice-d20"></i></a>
+                                </div>
+                            </li>
+                            {{/ifeq}}
+                            {{/each}}
+                        </ol>
+                        <div>
+                            <label for="toHitBonus">Бонус к попаданию:</label>
+                            <input id="toHitBonus" name="system.toHitBonus" value="{{system.toHitBonus}}" type="text" data-dtype="Number" class="compact" style="margin-left:8px;" />
+                        </div>
+                    </div>
+
+                    <div class="container col" style="margin-top:32px;">
+                        <h2 style="display:flex;justify-content: space-between;">
+                            <span>Авто-атаки</span>
+                            <i class="fas fa-plus itemAdder" data-item-type="autoHitAttack"></i>
+                        </h2>
+                        <ol class="item-list">
+                            {{#each actor.items as |item id|}}
+                            {{#ifeq item.type "autoHitAttack"}}
+                            <li class="item flexrow" data-item-id="{{item.id}}">
+                                <img class="item-image" src="{{item.img}}" title="{{item.name}}" />
+                                <h4 class="item-name">
+                                    {{item.name}}
+                                    <span class="item-tags">
+                                    {{#ifneq item.system.damageBonus 0}}
+                                        {{item.system.damageRoll}}+{{item.system.damageBonus}}
+                                    {{/ifneq}}
+
+                                    {{#ifeq item.system.damageBonus 0}}
+                                        {{item.system.damageRoll}}
+                                    {{/ifeq}}
+                                    </span>
+                                </h4>
+                                <div class="item-controls">
+                                    <a class="autoattack-roll" title="Бросок"><i class="fas fa-dice-d20"></i></a>
+                                </div>
+                            </li>
+                            {{/ifeq}}
+                            {{/each}}
+                        </ol>
+                    </div>
+
+                    <div class="container col" style="margin-top:32px;">
+                        <h2 style="display:flex;justify-content: space-between;">
+                            <span>ОЗ</span>
+                        </h2>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td style="width:50%">Текущие ОЗ</td>
+                                <td><input type="text" name="system.hp.current" value="{{system.hp.current}}" data-dtype="Number" class="compact" /></td>
+                            </tr>
+                            <tr>
+                                <td>Бонусные ОЗ</td>
+                                <td><input type="text" name="system.hp.bonus" value="{{system.hp.bonus}}" data-dtype="Number" class="compact" /></td>
+                            </tr>
+                            <tr>
+                                <td>Макс. ОЗ</td>
+                                <td style="padding-left:4px;">{{system.computed.hp.max}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div style="display:flex; align-items:center; margin-top:8px;">
+                            <input class="compact" id="hpadjust" value="0" style="width:60px;" />
+                            <input type="button" class="compact" id="hpdmg" value="Урон" style="margin-left:8px;" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container col" style="width:50%;">
+                    <h2 style="display:flex;justify-content: space-between;">
+                        <span>Боевые силы</span>
+                    </h2>
+                    <ol class="item-list">
+                        {{#each actor.items as |item id|}}
+                        {{#ifcombatpower ../actor.id item.id}}
+                        <li class="item flexrow {{#if item.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{item.id}}">
+                            <h4 class="item-name">
+                                {{#if item.system.greater}}
+                                <span class="greater-gift"><i class="fas fa-certificate greater-gift-badge" title="Больший дар"></i>{{item.name}}</span>
+                                {{/if}}
+                                {{#unless item.system.greater}}
+                                {{item.name}}
+                                {{/unless}}
+                                <span class="item-tags">
+                                {{#if item.system.atWill}}
+                                    <a title="По желанию"><i class="fas fa-star atwill-icon"></i></a>
+                                {{/if}}
+                                {{#if item.system.instant}}
+                                    <a title="Мгновенно"><i class="fas fa-bolt"></i></a>
+                                {{/if}}
+                                {{#if item.system.onTurn}}
+                                    <a title="В свой ход"><i class="fas fa-redo-alt"></i></a>
+                                {{/if}}
+                                {{#if item.system.action}}
+                                    <a title="Действие"><i class="fas fa-hourglass-end"></i></a>
+                                {{/if}}
+                                {{#if item.system.smite}}
+                                    <a title="Кара"><i class="fas fa-meteor"></i></a>
+                                {{/if}}
+                                </span>
+                            </h4>
+                            <div class="item-controls">
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                <a class="item-control power-use" title="Использовать (приложить Усилие и вывести в чат)"><i class="fas fa-hand-sparkles"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                        {{/ifcombatpower}}
+                        {{/each}}
+                    </ol>
+                    <h3>Свободное Усилие: {{system.computed.effort.available}}</h3>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab wealth" data-group="primary" data-tab="wealth">
+            <div class="container col" style="margin-bottom:32px;">
+                <h2>Богатство</h2>
+                <div class="tabular">
+                    <div>
+                        <label for="wealthTotal">Всего богатства:</label>
+                        <div>
+                            <input id="wealthTotal" name="system.wealth.total" value="{{system.wealth.total}}" type="text" data-dtype="Number" class="compact" />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="wealthDescription">Описание:</label>
+                        <textarea id="wealthDescription" name="system.wealth.description">{{system.wealth.description}}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="container col">
+                <h2 style="display:flex;justify-content: space-between;">
+                    <span>Сокровище</span>
+                    <i class="fas fa-plus itemAdder" data-item-type="treasure"></i>
+                </h2>
+                <ol class="item-list">
+                    {{#each actor.items as |item id|}}
+                    {{#ifeq item.type "treasure"}}
+                    <li class="item flexrow" data-item-id="{{item.id}}">
+                        <h4 class="item-name">{{item.name}} (Ценность {{item.system.value}})</h4>
+                        <div class="item-controls">
+                            <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
+                        </div>
+                    </li>
+                    {{/ifeq}}
+                    {{/each}}
+                </ol>
+            </div>
+        </div>
+
+        <div class="tab artifacts" data-group="primary" data-tab="artifacts">
+            <div class="container col">
+                <h2 style="display:flex;justify-content: space-between;">
+                    <span>Артефакты</span>
+                    <i class="fas fa-plus itemAdder" data-item-type="artifact"></i>
+                </h2>
+                <ol class="item-list">
+                    {{#each system.computed.artifacts as |artifact id|}}
+                    <li class="item flexrow" data-item-id="{{artifact.item.id}}">
+                        <h4 class="item-name">
+                            {{artifact.item.name}} (Усилие {{artifact.item.system.computed.effort.available}})
+                            <span class="item-tags">
+                            {{#if artifact.item.system.bound}}
+                                Связан
+                            {{/if}}
+                            </span>
+                        </h4>
+                        <div class="item-controls">
+                            {{#ifeq artifact.item.system.effectType "attack"}}
+                            <a class="item-control art-effect-roll" title="Бросок атаки"><i class="fas fa-dice-d20"></i></a>
+                            {{/ifeq}}
+                            {{#ifeq artifact.item.system.effectType "save"}}
+                            <a class="item-control art-effect-roll" title="Спасбросок / урон"><i class="fas fa-shield-alt"></i></a>
+                            {{/ifeq}}
+                            <a class="item-control itemAdder" data-item-type="artifactPower" data-artifact-id="{{artifact.item.id}}" title="Добавить Дар артефакта"><i class="fas fa-plus"></i></a>
+                            <a class="item-control item-atWill-effort" title="Связать (по желанию)"><i class="fas fa-power-off"></i></a>
+                        </div>
+                    </li>
+                        {{#each artifact.artifactPowers as |power id|}}
+                        {{#ifeq power.type "artifactPower"}}
+                        <li class="item flexrow {{#if power.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{power.id}}">
+                            <h4 class="item-name" style="padding-left:16px;">
+                                {{#if power.system.greater}}
+                                <span class="greater-gift"><i class="fas fa-certificate greater-gift-badge" title="Больший дар"></i>{{power.name}}</span>
+                                {{/if}}
+                                {{#unless power.system.greater}}
+                                {{power.name}}
+                                {{/unless}}
+                                <span class="item-tags">
+                                {{#if power.system.atWill}}
+                                    <a title="По желанию"><i class="fas fa-star atwill-icon"></i></a>
+                                {{/if}}
+                                {{#if power.system.instant}}
+                                    <a title="Мгновенно"><i class="fas fa-bolt"></i></a>
+                                {{/if}}
+                                {{#if power.system.onTurn}}
+                                    <a title="В свой ход"><i class="fas fa-redo-alt"></i></a>
+                                {{/if}}
+                                {{#if power.system.action}}
+                                    <a title="Действие"><i class="fas fa-hourglass-end"></i></a>
+                                {{/if}}
+                                {{#if power.system.smite}}
+                                    <a title="Кара"><i class="fas fa-meteor"></i></a>
+                                {{/if}}
+                            </span>
+                            </h4>
+                            <div class="item-controls">
+                                {{#if power.system.computed.effortHeld}}<a class="item-control item-effort-return" title="Приложено Усилия: {{power.system.computed.effortHeld}} (По желанию {{power.system.effort.atWill}} · Сцена {{power.system.effort.scene}} · День {{power.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{power.system.computed.effortHeld}}</a>{{/if}}
+                                <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                                {{#ifeq power.system.effectType "attack"}}
+                                <a class="item-control art-effect-roll" title="Бросок атаки"><i class="fas fa-dice-d20"></i></a>
+                                {{/ifeq}}
+                                {{#ifeq power.system.effectType "save"}}
+                                <a class="item-control art-effect-roll" title="Спасбросок / урон"><i class="fas fa-shield-alt"></i></a>
+                                {{/ifeq}}
+                                <a class="item-control power-use" title="Использовать (приложить Усилие и вывести в чат)"><i class="fas fa-hand-sparkles"></i></a>
+                                <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </li>
+                        <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px 16px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{power.system.description}}</li>
+                        {{/ifeq}}
+                        {{/each}}
+                    {{/each}}
+                </ol>
+                <h3>Свободное Усилие: {{system.computed.effort.available}}</h3>
+            </div>
+        </div>
+
+        <div class="tab projects" data-group="primary" data-tab="projects">
+            <div class="container col">
+                <h2 style="display:flex;justify-content: space-between;">
+                    <span>Проекты</span>
+                    <i class="fas fa-plus itemAdder" data-item-type="project"></i>
+                </h2>
+                <ol class="item-list">
+                    {{#each actor.items as |item id|}}
+                    {{#ifeq item.type "project"}}
+                    <li class="item flexrow" data-item-id="{{item.id}}">
+                        <h4 class="item-name">
+                            {{item.name}}
+                            <span class="item-tags">
+                                {{#if item.system.completed}}
+                                    Завершён
+                                {{/if}}
+                                {{#unless item.system.completed}}
+                                    В процессе
+                                    {{#if item.system.active}}
+                                        / Действует
+                                    {{/if}}
+                                {{/unless}}
+                            </span>
+                        </h4>
+                        <div class="item-controls">
+                            <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
+                        </div>
+                    </li>
+                    {{/ifeq}}
+                    {{/each}}
+                </ol>
+                <div style="display:flex;align-items:center;justify-content: space-around">
+                    <div>
+                        <label for="influenceContributed">Прочее потраченное Влияние:</label>
+                        <input id="influenceContributed" name="system.influence.contributed" value="{{system.influence.contributed}}" type="text" data-dtype="Number" class="compact" style="margin-left:8px" />
+                    </div>
+                    <div>
+                        <label for="dominionContributed">Прочее потраченное Домино:</label>
+                        <input id="dominionContributed" name="system.dominion.contributed" value="{{system.dominion.contributed}}" type="text" data-dtype="Number" class="compact" style="margin-left:8px" />
+                    </div>
+                </div>
+            </div>
+            <div class="container col" style="margin-top:32px;">
+                <h2 style="display:flex;justify-content: space-between;">
+                    <span>Культ</span>
+                    <i class="fas fa-plus itemAdder" data-item-type="cult"></i>
+                </h2>
+                <ol class="item-list">
+                    {{#each actor.items as |item id|}}
+                    {{#ifeq item.type "cult"}}
+                    <li class="item flexrow" data-item-id="{{item.id}}">
+                        <h4 class="item-name">
+                            {{item.name}}
+                            <span class="item-tags">
+                            </span>
+                        </h4>
+                        <div class="item-controls">
+                            <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
+                        </div>
+                    </li>
+                    {{/ifeq}}
+                    {{/each}}
+                </ol>
+                <div style="display:flex;align-items:center;justify-content: space-around">
+                    <div>
+                        <label for="dominionOtherIncome">Прочий доход владения:</label>
+                        <input id="dominionOtherIncome" name="system.dominion.otherIncome" value="{{system.dominion.otherIncome}}" type="text" data-dtype="Number" class="compact" style="margin-left:8px" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>
+

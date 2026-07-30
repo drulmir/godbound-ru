@@ -1,0 +1,33 @@
+<div class="godbound chat-block gb-card gb-card--power">
+    <h2 class="gb-title"><span class="gb-title__text">{{title}}</span></h2>
+
+    <div class="gb-tags">
+        {{#if data.effort.atWill}}<span class="gb-tag"><i class="fas fa-power-off"></i> Усилие: по желанию</span>{{/if}}
+        {{#if data.effort.scene}}<span class="gb-tag"><i class="fas fa-clock"></i> Усилие: на сцену</span>{{/if}}
+        {{#if data.effort.day}}<span class="gb-tag"><i class="fas fa-sun"></i> Усилие: на день</span>{{/if}}
+        {{#if data.item.system.smite}}<span class="gb-tag gb-tag--smite"><i class="fas fa-meteor"></i> Кара</span>{{/if}}
+    </div>
+
+    <div class="gb-actor">
+        <div class="gb-portraits">
+            <img class="gb-portrait" src="{{data.actor.img}}" alt="" title="{{data.actor.name}}">
+            <img class="gb-portrait" src="{{data.itemImg}}" alt="" title="{{data.item.name}}">
+        </div>
+        <div class="gb-names">
+            <span class="gb-name" title="{{data.item.name}}">{{data.item.name}}</span>
+            <span class="gb-sub" title="{{data.actor.name}}">{{data.actor.name}}</span>
+        </div>
+    </div>
+
+    <div class="gb-desc{{#if data.descriptionIsPlain}} gb-desc--pre{{/if}}">{{{data.description}}}</div>
+
+    {{#if data.item.system.saveType}}
+    {{#ifneq data.item.system.saveType "none"}}
+    <div class="gb-actions">
+        <div class="gb-btns gb-btns--1">
+            <button type="button" class="gb-btn gb-btn--primary gift-save-roll-btn" data-save="{{data.item.system.saveType}}" data-gift-name="{{data.item.name}}"><i class="fas fa-shield-halved"></i> Спасбросок цели</button>
+        </div>
+    </div>
+    {{/ifneq}}
+    {{/if}}
+</div>

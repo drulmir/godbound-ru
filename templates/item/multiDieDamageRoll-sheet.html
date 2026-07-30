@@ -1,0 +1,55 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs active" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Атака несколькими костями</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="damageRoll">Урон:</label>
+                            <div style="display: flex; align-items: center">
+                                <input id="damageRoll" name="system.damageRoll" type="text"
+                                       value="{{item.system.damageRoll}}" placeholder="напр. 2d8"/>
+                                +
+                                <input id="damageBonus" name="system.damageBonus" type="text"
+                                       value="{{item.system.damageBonus}}" data-dtype="Number" class="compact"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="damageType">Тип урона:</label>
+                            <select name="system.damageType" id="damageType">
+                                {{#select item.system.damageType}}
+                                <option value="physical">Физический</option>
+                                <option value="fire">Огонь</option>
+                                <option value="cold">Холод</option>
+                                <option value="lightning">Молния</option>
+                                <option value="acid">Кислота</option>
+                                <option value="poison">Яд</option>
+                                <option value="disease">Болезнь</option>
+                                <option value="magic">Магия</option>
+                                <option value="holy">Свет</option>
+                                <option value="unholy">Тьма</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

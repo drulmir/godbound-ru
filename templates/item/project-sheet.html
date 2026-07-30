@@ -1,0 +1,98 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs active" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Проект</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="description">Описание:</label>
+                            <textarea id="description" name="system.description">{{system.description}}</textarea>
+                        </div>
+                        <div>
+                            <label for="deeds">Треб. деяния:</label>
+                            <textarea id="deeds" name="system.deeds">{{system.deeds}}</textarea>
+                        </div>
+                        <div>
+                            <label for="scope">Масштаб:</label>
+                            <select id="scope" name="system.scope" data-dtype="Number">
+                                {{#select system.scope}}
+                                <option value="1">Деревня</option>
+                                <option value="2">Город</option>
+                                <option value="4">Регион</option>
+                                <option value="8">Нация</option>
+                                <option value="16">Королевство</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="difficulty">Сложность:</label>
+                            <select id="difficulty" name="system.difficulty" data-dtype="Number">
+                                {{#select system.difficulty}}
+                                <option value="1">Правдоподобно</option>
+                                <option value="2">Невероятно</option>
+                                <option value="4">Невозможно</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="resistance">Сопротивление:</label>
+                            <input id="resistance" name="system.resistance" type="text" value="{{system.resistance}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        <div>
+                            <label>Цена Домино:</label>
+                            <span style="padding:4px 0;">{{system.computed.cost}}</span>
+                        </div>
+                        <div>
+                            <label>Оплачено:</label>
+                            <div style="display: flex; align-items: center;justify-content: space-around">
+                                <div style="width:25%;text-align:center">
+                                    Домино:
+                                    <input id="committedDominion" name="system.committedDominion" type="text" value="{{system.committedDominion}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:25%;text-align:center">
+                                    Внес.Домино:
+                                    <input id="contributedDominion" name="system.contributedDominion" type="text" value="{{system.contributedDominion}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:25%;text-align:center">
+                                    Влиян:
+                                    <input id="committedInfluence" name="system.committedInfluence" type="text" value="{{system.committedInfluence}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:25%;text-align:center">
+                                    Внес.Влиян:
+                                    <input id="contributedInfluence" name="system.contributedInfluence" type="text" value="{{system.contributedInfluence}}" data-dtype="Number" class="compact"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Осталось:</label>
+                            <span style="padding:4px 0;">{{system.computed.remaining}}</span>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.active" {{checked system.active}} style="margin-left:0" />Активен
+                                <input type="checkbox" name="system.completed" {{checked system.completed}} style="margin-left:16px" />Завершён
+                            </div>
+                        </div>
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

@@ -1,0 +1,147 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs active" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Уровень Искусства</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="level">Уровень:</label>
+                            <input id="level" name="system.level" type="text" value="{{system.level}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        <div>
+                            <label for="description">Описание:</label>
+                            <textarea id="description" name="system.description" class="xtall">{{system.description}}</textarea>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display:flex; align-items: center">
+                                <input type="checkbox" name="system.usable" {{checked system.usable}} style="margin-left:0" />Можно использовать
+                            </div>
+                        </div>
+                        <div>
+                            <label>Активация:</label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.constant" {{checked system.constant}} style="margin-left:0" />Постоянно
+                                <input type="checkbox" name="system.instant" {{checked system.instant}} />Мгновенно
+                                <input type="checkbox" name="system.onTurn" {{checked system.onTurn}} />В свой ход
+                                <input type="checkbox" name="system.action" {{checked system.action}} />Действие
+                            </div>
+                        </div>
+                        <div>
+                            <label>Усилие:</label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.noEffort" {{checked system.noEffort}} style="margin-left:0" />Нет
+                                <input type="checkbox" name="system.atWill" {{checked system.atWill}} />По желанию
+                                <input type="checkbox" name="system.scene" {{checked system.scene}} />Сцена
+                                <input type="checkbox" name="system.day" {{checked system.day}} />День
+                            </div>
+                        </div>
+                        <div>
+                            <label for="effortCost">Цена Усилия:</label>
+                            <input id="effortCost" name="system.effortCost" type="text" value="{{system.effortCost}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.combatPower" {{checked system.combatPower}} style="margin-left:0" />Бой Power
+                                <input type="checkbox" name="system.smite" {{checked system.smite}} style="margin-left:16px;" />Кара
+                            </div>
+                        </div>
+                        <div>
+                            <label for="effectType" title="Что делает кнопка броска у этого Искусства: бросок атаки против КБ цели, спасбросок цели (урон с возможностью половины), либо ничего (отказ).">Воздействие:</label>
+                            <select id="effectType" name="system.effectType">
+                                {{#select system.effectType}}
+                                <option value="none">Нет (отказ)</option>
+                                <option value="attack">Атака</option>
+                                <option value="save">Спасбросок</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        {{#ifeq system.effectType "attack"}}
+                        <div>
+                            <label for="attr">Хар-ка:</label>
+                            <select name="system.attr" id="attr">
+                                {{#select system.attr}}
+                                <option value="">—</option>
+                                <option value="str">Сил</option>
+                                <option value="dex">Лов</option>
+                                <option value="con">Тел</option>
+                                <option value="int">Инт</option>
+                                <option value="wis">Мдр</option>
+                                <option value="cha">Хар</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="hitBonus">Бонус попадания:</label>
+                            <input id="hitBonus" name="system.hitBonus" type="text" value="{{system.hitBonus}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        {{/ifeq}}
+                        {{#ifeq system.effectType "save"}}
+                        <div>
+                            <label for="saveType" title="Спасбросок, который бросает цель. При успехе урон уменьшается вдвое.">Спасбросок цели:</label>
+                            <select id="saveType" name="system.saveType">
+                                {{#select system.saveType}}
+                                <option value="none">Нет</option>
+                                <option value="hardiness">Стойкость</option>
+                                <option value="evasion">Уклонение</option>
+                                <option value="spirit">Дух</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        {{/ifeq}}
+                        {{#if (or (eq system.effectType "attack") (eq system.effectType "save"))}}
+                        <div>
+                            <label for="damageRoll">Урон:</label>
+                            <div style="display: flex; align-items: center">
+                                <input id="damageRoll" name="system.damageRoll" type="text" value="{{system.damageRoll}}" placeholder="напр. 1d8" class="compactplus"/>
+                                +
+                                <input id="damageBonus" name="system.damageBonus" type="text" value="{{system.damageBonus}}" data-dtype="Number" class="compact"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="damageType">Тип урона:</label>
+                            <select name="system.damageType" id="damageType">
+                                {{#select system.damageType}}
+                                <option value="physical">Физический</option>
+                                <option value="fire">Огонь</option>
+                                <option value="cold">Холод</option>
+                                <option value="lightning">Молния</option>
+                                <option value="acid">Кислота</option>
+                                <option value="poison">Яд</option>
+                                <option value="disease">Болезнь</option>
+                                <option value="magic">Магия</option>
+                                <option value="holy">Свет</option>
+                                <option value="unholy">Тьма</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.magic" {{checked system.magic}} style="margin-left:0" />Магический урон
+                            </div>
+                        </div>
+                        {{/if}}
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

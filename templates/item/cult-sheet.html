@@ -1,0 +1,65 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs active" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Культ</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="description">Описание:</label>
+                            <textarea id="description" name="system.description">{{system.description}}</textarea>
+                        </div>
+                        <div>
+                            <label for="tenets">Принципы:</label>
+                            <textarea id="tenets" name="system.tenets" class="med">{{system.tenets}}</textarea>
+                        </div>
+                        <div>
+                            <label for="features">Особенности:</label>
+                            <textarea id="features" name="system.features" class="med">{{system.features}}</textarea>
+                        </div>
+                        <div>
+                            <label for="problems">Проблемы:</label>
+                            <textarea id="problems" name="system.problems" class="med">{{system.problems}}</textarea>
+                        </div>
+                        <div>
+                            <label for="power">Сила:</label>
+                            <input id="power" name="system.power" type="text" value="{{system.power}}" data-dtype="Number"/>
+                        </div>
+                        <div>
+                            <label for="cohesion">Сплочённость:</label>
+                            <input id="cohesion" name="system.cohesion" type="text" value="{{system.cohesion}}" data-dtype="Number"/>
+                        </div>
+                        <div>
+                            <label for="income">Доход:</label>
+                            <input id="income" name="system.income" type="text" value="{{system.income}}" data-dtype="Number"/>
+                        </div>
+                        <div>
+                            <label for="trouble">Беда:</label>
+                            <input id="trouble" name="system.trouble" type="text" value="{{system.trouble}}" data-dtype="Number"/>
+                        </div>
+                        <div>
+                            <label>Макс. беды:</label>
+                            <span style="padding:4px 0;">{{system.computed.maxTrouble}}</span>
+                        </div>
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

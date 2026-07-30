@@ -1,0 +1,167 @@
+<form class="{{cssClass}}" autocomplete="off" style="overflow-y:scroll;">
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="attrs">Организация</a>
+        <a class="item" data-tab="notes">Заметки</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        <div class="tab attrs" data-group="primary" data-tab="attrs">
+            <div class="container row sheet-header">
+                <div class="header-fields tabular" style="flex:1 1 auto;">
+                    <div>
+                        <label for="name">Название:</label> <input id="name" name="name" type="text" value="{{actor.name}}"/>
+                    </div>
+                    <div>
+                        <label for="description">Описание:</label> <textarea id="description" name="system.description">{{system.description}}</textarea>
+                    </div>
+                    <div>
+                        <label for="goal">Цели:</label> <textarea id="goal" name="system.goal">{{system.goal}}</textarea>
+                    </div>
+                </div>
+                <div style="position:relative; flex: 0 0 100px;">
+                    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+                    <a class="token-image-share" title="Показать всем игрокам по центру экрана" style="position:absolute; bottom:2px; right:2px; background:rgba(255,255,255,0.85); border-radius:50%; width:22px; height:22px; text-align:center; line-height:22px;"><i class="fas fa-eye" style="color:#000;"></i></a>
+                </div>
+            </div>
+
+            <div class="container col" style="margin-top:8px;">
+                <h2 style="margin:0;">Действия фракции</h2>
+                <div style="font-size:12px;color:#555;margin:2px 0 6px;">Бросает Кость Действий, разрешает проверки/Противоборство и применяет изменения ресурсов; результат — в чат.</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    <input type="button" class="faction-action" data-faction-action="gather" value="Накопить Силы" title="Внутреннее: проверка Неприятностей; при успехе +½ Могущества Владычества." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="enact" value="Принять Изменение" title="Внутреннее: решить Проблему / создать Особенность / общее изменение." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="cohesion" value="Восстановить Сплочённость" title="Внутреннее: потратить Владычество (Невероятное изменение); при успехе +1 Сплочённости." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="help" value="Помочь Союзнику" title="Внешнее: передать Владычество союзнику (проверка Неприятностей)." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="attack" value="Атаковать Соперника" title="Внешнее: Противоборство против соперника." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="expand" value="Расширить Участие" title="Внешнее: Противоборство; при победе +1 Участие в цели." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="remove" value="Устранить Участие" title="Внешнее: Противоборство; снять 1 Участие соперника в себе." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="spend" value="Потратить Участие" title="Особое: потратить Участие, чтобы украсть Владычество или изменить бросок." style="width:auto;flex:0 0 auto;"/>
+                </div>
+            </div>
+
+            <div class="container col" style="margin-top:12px;">
+                <h2 style="display:flex;justify-content:space-between;margin:0;">
+                    <span>Свои действия</span>
+                    <i class="fas fa-plus faction-custom-add" title="Добавить своё действие фракции"></i>
+                </h2>
+                {{#each system.faction.customActions as |ca i|}}
+                <div class="container row" style="align-items:center;gap:6px;margin-top:4px;">
+                    <input type="text" class="faction-custom-input" data-index="{{i}}" data-field="name" value="{{ca.name}}" style="flex:0 0 30%;" />
+                    <input type="text" class="faction-custom-input" data-index="{{i}}" data-field="note" value="{{ca.note}}" placeholder="эффект / заметка (в чат)" style="flex:1 1 auto;" />
+                    <a class="faction-custom-roll" data-index="{{i}}" title="Бросить Кость Действий и вывести в чат"><i class="fas fa-dice-d6"></i></a>
+                    <a class="faction-custom-delete" data-index="{{i}}" title="Удалить"><i class="fas fa-trash"></i></a>
+                </div>
+                {{/each}}
+            </div>
+
+            <div class="container row" style="margin-top:8px;">
+                <div class="container col" style="width:50%;">
+                    <h2>Атрибуты</h2>
+                    <div class="container row">
+                        <div>
+                            <label for="factionPower">Мощь:</label>
+                            <input id="factionPower" type="text" name="system.faction.power" value="{{system.faction.power}}" data-dtype="Number" class="compact" style="margin-left:8px;" />
+                        </div>
+                        <div style="margin-left:32px;">
+                            <label for="factionActionDie">Кубик действия:</label>
+                            <input id="factionActionDie" type="text" name="system.faction.actionDie" value="{{system.faction.actionDie}}" class="compact" style="margin-left:8px;" />
+                        </div>
+                    </div>
+
+                    <h2 style="margin-top:24px;">Сплочённость</h2>
+                    <div class="container row">
+                        <div>
+                            <label for="cohesionCurrent">Текущая:</label>
+                            <input id="cohesionCurrent" type="text" name="system.faction.cohesion.current" value="{{system.faction.cohesion.current}}" data-dtype="Number" class="compact" style="margin-left:8px;" />
+                        </div>
+                        <div style="margin-left:32px;">
+                            <label for="cohesionMax">Макс:</label>
+                            <input id="cohesionMax" type="text" name="system.faction.cohesion.max" value="{{system.faction.cohesion.max}}" data-dtype="Number" class="compact" style="margin-left:8px;" />
+                        </div>
+                    </div>
+
+                    <h2 style="margin-top:24px;">Домино</h2>
+                    <table class="headered">
+                        <thead>
+                        <tr>
+                            <td>Всего</td>
+                            <td>Потрачено</td>
+                            <td>Свободно</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type="text" data-dtype="Number" name="system.faction.dominion.total" value="{{system.faction.dominion.total}}" /></td>
+                            <td>{{system.computed.faction.dominion.spent}}</td>
+                            <td>{{system.computed.faction.dominion.free}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 style="margin-top:24px;">Интересы</h2>
+                    <textarea name="system.faction.interests" style="height:100px;font-size:14px">{{system.faction.interests}}</textarea>
+
+                    <h2 style="margin-top:24px;">Участие</h2>
+                    <textarea name="system.faction.involvement" style="height:80px;font-size:14px" placeholder="Участие в других фракциях, напр.: «Соседний город — 3»">{{system.faction.involvement}}</textarea>
+                </div>
+
+                <div class="container col" style="width:50%;">
+                    <h2>Особенности</h2>
+                    <textarea name="system.faction.features" style="height:100px;font-size:14px">{{system.faction.features}}</textarea>
+
+                    <h2 style="margin-top:24px;">Беды</h2>
+                    <div class="container row">
+                        <div>
+                            <label for="troubleCurrent">Текущие:</label>
+                            <input id="troubleCurrent" type="text" name="system.faction.trouble.current" value="{{system.faction.trouble.current}}" data-dtype="Number" class="compact" style="margin-left:8px;" />
+                        </div>
+                        <div style="margin-left:32px;">
+                            <label for="troubleMax">Макс:</label>
+                            <input id="troubleMax" type="text" name="system.faction.trouble.max" value="{{system.faction.trouble.max}}" data-dtype="Number" class="compact" style="margin-left:8px;" />
+                        </div>
+                    </div>
+                    <textarea name="system.faction.problem" style="height:80px;font-size:14px;margin-top:8px;">{{system.faction.problem}}</textarea>
+                </div>
+            </div>
+
+            <div class="container col" style="margin-top:24px;">
+                <h2 style="display:flex;justify-content: space-between;">
+                    <span>Проекты</span>
+                    <i class="fas fa-plus itemAdder" data-item-type="project"></i>
+                </h2>
+                <ol class="item-list">
+                    {{#each actor.items as |item id|}}
+                    {{#ifeq item.type "project"}}
+                    <li class="item flexrow" data-item-id="{{item.id}}">
+                        <h4 class="item-name">
+                            {{item.name}}
+                            <span class="item-tags">
+                                {{#if item.system.completed}}Завершён{{/if}}
+                                {{#unless item.system.completed}}В процессе{{/unless}}
+                            </span>
+                        </h4>
+                        <div class="item-controls">
+                            <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
+                            <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    {{/ifeq}}
+                    {{/each}}
+                </ol>
+            </div>
+        </div>
+
+        <div class="tab notes" data-group="primary" data-tab="notes">
+            <div class="container col">
+                <h2>Заметки</h2>
+                <textarea name="system.faction.notes" style="height:120px;font-size:14px">{{system.faction.notes}}</textarea>
+                <h3 style="margin-top:16px;">Общие заметки</h3>
+                <textarea name="system.notes" style="height:120px;font-size:14px">{{system.notes}}</textarea>
+            </div>
+        </div>
+    </section>
+</form>

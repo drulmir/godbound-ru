@@ -1,0 +1,451 @@
+{
+  "Actor": {
+    "types": [
+      "pc",
+      "npc",
+      "faction"
+    ],
+    "pc": {
+      "description": "",
+      "languages": "",
+      "goal": "",
+      "level": 1,
+      "xp": 0,
+      "hp": {
+        "current": 0,
+        "bonus": 0
+      },
+      "attributes": {
+        "str": {
+          "score": 10
+        },
+        "dex": {
+          "score": 10
+        },
+        "con": {
+          "score": 10
+        },
+        "int": {
+          "score": 10
+        },
+        "wis": {
+          "score": 10
+        },
+        "cha": {
+          "score": 10
+        }
+      },
+      "saves": {
+        "hardiness": {
+          "bonus": 0
+        },
+        "evasion": {
+          "bonus": 0
+        },
+        "spirit": {
+          "bonus": 0
+        }
+      },
+      "toHitBonus": 0,
+      "facts": "",
+      "armor": {
+        "type": "none",
+        "shield": false,
+        "bonus": 0,
+        "desc": "None (Skin or Clothing)",
+        "attribute": "dex",
+        "penalizeHardiness": false,
+        "penalizeEvasion": false,
+        "penalizeSpirit": false
+      },
+      "effort": {
+        "total": 2,
+        "atWill": 0,
+        "scene": 0,
+        "day": 0,
+        "healing": 0
+      },
+      "influence": {
+        "total": 0,
+        "contributed": 0
+      },
+      "dominion": {
+        "total": 0,
+        "contributed": 0,
+        "otherIncome": 0
+      },
+      "giftPoints": {
+        "total": 0,
+        "contributed": 0
+      },
+      "wealth": {
+        "total": 0,
+        "description": ""
+      },
+      "divineFury": {
+        "remaining": 1,
+        "usedAtLevel": 0,
+        "furyEffort": 0
+      },
+      "notes": ""
+    },
+    "npc": {
+      "description": "",
+      "goal": "",
+      "move": "30' run",
+      "save": 15,
+      "morale": 9,
+      "ac": 10,
+      "hd": {
+        "current": 0,
+        "max": 0
+      },
+      "mobHd": {
+        "current": 0,
+        "max": 0
+      },
+      "numActions": 1,
+      "numAttacks": 1,
+      "toHitBonus": 0,
+      "effort": {
+        "total": 0,
+        "atWill": 0,
+        "scene": 0,
+        "day": 0,
+        "healing": 0
+      },
+      "notes": "",
+      "cardinality": "Individual",
+      "combatNotes": "",
+      "tactics": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "faction": {
+        "power": 1,
+        "actionDie": "1d6",
+        "cohesion": {
+          "current": 1,
+          "max": 1
+        },
+        "dominion": {
+          "total": 0
+        },
+        "trouble": {
+          "current": 0,
+          "max": 6
+        },
+        "features": "",
+        "problem": "",
+        "interests": "",
+        "involvement": "",
+        "notes": "",
+        "customActions": []
+      }
+    },
+    "faction": {
+      "description": "",
+      "goal": "",
+      "notes": "",
+      "faction": {
+        "power": 1,
+        "actionDie": "1d6",
+        "cohesion": {
+          "current": 1,
+          "max": 1
+        },
+        "dominion": {
+          "total": 0
+        },
+        "trouble": {
+          "current": 0,
+          "max": 6
+        },
+        "features": "",
+        "problem": "",
+        "interests": "",
+        "involvement": "",
+        "notes": "",
+        "customActions": []
+      }
+    }
+  },
+  "Item": {
+    "types": [
+      "autoHitAttack",
+      "multiDieDamageRoll",
+      "attack",
+      "project",
+      "item",
+      "boundWord",
+      "divineGift",
+      "divineMiracle",
+      "artifact",
+      "artifactPower",
+      "treasure",
+      "invocation",
+      "tactic",
+      "cult",
+      "art",
+      "artLevel",
+      "fact",
+      "language"
+    ],
+    "autoHitAttack": {
+      "damageRoll": "1d8",
+      "damageBonus": 0,
+      "magic": false,
+      "damageType": "physical",
+      "fray": false
+    },
+    "multiDieDamageRoll": {
+      "damageRoll": "1d8",
+      "damageBonus": 0,
+      "damageType": "physical"
+    },
+    "attack": {
+      "attr": "str",
+      "hitBonus": 0,
+      "range": "Melee / 30ft",
+      "area": "Single Target",
+      "damageRoll": "1d8",
+      "damageBonus": 0,
+      "magic": false,
+      "damageType": "physical",
+      "guaranteedMinDamage": 0,
+      "autoHit": false,
+      "maxDamage": false,
+      "areaAttack": false,
+      "notes": ""
+    },
+    "item": {
+      "description": ""
+    },
+    "boundWord": {
+      "description": "",
+      "pdfCode": "",
+      "pdfPage": 1,
+      "commitType": "day",
+      "free": false,
+      "effort": {
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      },
+      "passive": {
+        "reduction": 0,
+        "immune": "",
+        "resistant": "",
+        "vulnerable": ""
+      },
+      "saveType": "none"
+    },
+    "divineGift": {
+      "word": "",
+      "description": "",
+      "free": false,
+      "constant": false,
+      "instant": false,
+      "onTurn": false,
+      "action": false,
+      "smite": false,
+      "noEffort": false,
+      "atWill": false,
+      "scene": false,
+      "day": false,
+      "greater": false,
+      "combatPower": false,
+      "passive": {
+        "reduction": 0,
+        "immune": "",
+        "resistant": "",
+        "vulnerable": ""
+      },
+      "guaranteedMinDamage": 0,
+      "combatTag": "",
+      "saveType": "none",
+      "effort": {
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      }
+    },
+    "artifactPower": {
+      "description": "",
+      "constant": false,
+      "instant": false,
+      "onTurn": false,
+      "action": false,
+      "smite": false,
+      "noEffort": false,
+      "atWill": false,
+      "scene": false,
+      "day": false,
+      "greater": false,
+      "combatPower": false,
+      "artifactId": "",
+      "effortCost": 1,
+      "passive": {
+        "reduction": 0,
+        "immune": "",
+        "resistant": "",
+        "vulnerable": ""
+      },
+      "effectType": "none",
+      "attr": "",
+      "hitBonus": 0,
+      "damageRoll": "",
+      "damageBonus": 0,
+      "damageType": "magic",
+      "magic": true,
+      "saveType": "none",
+      "effort": {
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      }
+    },
+    "divineMiracle": {
+      "description": "",
+      "effortCost": 1,
+      "smite": false,
+      "instant": false,
+      "onTurn": false,
+      "action": false,
+      "day": true,
+      "combatPower": false,
+      "effort": {
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      }
+    },
+    "project": {
+      "description": "",
+      "deeds": "",
+      "difficulty": 1,
+      "scope": 1,
+      "resistance": 0,
+      "completed": false,
+      "active": false,
+      "committedDominion": 0,
+      "committedInfluence": 0,
+      "contributedDominion": 0,
+      "contributedInfluence": 0
+    },
+    "artifact": {
+      "description": "",
+      "dominionCost": 0,
+      "committedDominion": 0,
+      "contributedDominion": 0,
+      "completed": false,
+      "effort": {
+        "total": 0,
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      },
+      "bound": false,
+      "mortalEffect": "",
+      "effectType": "none",
+      "attr": "",
+      "hitBonus": 0,
+      "damageRoll": "",
+      "damageBonus": 0,
+      "damageType": "magic",
+      "magic": true,
+      "saveType": "none"
+    },
+    "treasure": {
+      "description": "",
+      "value": 0
+    },
+    "invocation": {
+      "description": "",
+      "level": ""
+    },
+    "tactic": {
+      "description": ""
+    },
+    "cult": {
+      "description": "",
+      "power": 1,
+      "cohesion": 1,
+      "income": 1,
+      "tenets": "",
+      "features": "",
+      "problems": "",
+      "trouble": 0
+    },
+    "art": {
+      "category": "martialStrife",
+      "description": "",
+      "usable": false,
+      "constant": false,
+      "instant": false,
+      "onTurn": false,
+      "action": false,
+      "smite": false,
+      "noEffort": false,
+      "atWill": false,
+      "scene": false,
+      "day": false,
+      "combatPower": false,
+      "effortCost": 1,
+      "effectType": "none",
+      "attr": "",
+      "hitBonus": 0,
+      "damageRoll": "",
+      "damageBonus": 0,
+      "damageType": "magic",
+      "magic": true,
+      "saveType": "none",
+      "effort": {
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      }
+    },
+    "artLevel": {
+      "artId": "",
+      "level": 1,
+      "description": "",
+      "usable": true,
+      "constant": false,
+      "instant": false,
+      "onTurn": false,
+      "action": false,
+      "smite": false,
+      "noEffort": false,
+      "atWill": false,
+      "scene": false,
+      "day": false,
+      "greater": false,
+      "combatPower": false,
+      "effortCost": 1,
+      "effectType": "none",
+      "attr": "",
+      "hitBonus": 0,
+      "damageRoll": "",
+      "damageBonus": 0,
+      "damageType": "magic",
+      "magic": true,
+      "saveType": "none",
+      "effort": {
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      }
+    },
+    "fact": {
+      "description": ""
+    },
+    "language": {
+      "description": ""
+    }
+  }
+}

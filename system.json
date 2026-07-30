@@ -1,0 +1,152 @@
+{
+  "id": "godbound",
+  "title": "Godbound",
+  "description": "Русскоязычная система для настольной ролевой игры Godbound в Foundry VTT: персонажи, НИП, толпы, Слова и Дары, теургия, артефакты и действия фракций.",
+  "version": "1.0.0",
+  "socket": true,
+  "license": "LICENSE.txt",
+  "readme": "README.md",
+  "url": "https://github.com/drulmir/godbound-ru",
+  "manifest": "https://raw.githubusercontent.com/drulmir/godbound-ru/main/system.json",
+  "download": "https://github.com/drulmir/godbound-ru/archive/refs/heads/main.zip",
+  "media": [
+    {
+      "type": "setup",
+      "url": "systems/godbound/assets/godbound-setup.svg",
+      "thumbnail": "systems/godbound/assets/godbound-setup.svg"
+    },
+    {
+      "type": "cover",
+      "url": "systems/godbound/assets/godbound-setup.svg"
+    },
+    {
+      "type": "icon",
+      "url": "systems/godbound/assets/godbound-icon.svg"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "Shatkovskii Daniil"
+    },
+    {
+      "name": "jasonwocky (original Godbound system)"
+    }
+  ],
+  "esmodules": ["module/gb.js"],
+  "styles": ["styles/gb.css", "styles/gb-chat.css"],
+  "packs": [
+    {
+      "name": "words-and-gifts",
+      "label": "Слова и Дары (Words & Gifts)",
+      "path": "packs/words-and-gifts",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "roll20-npcs",
+      "label": "Персонажи (Roll20 Import)",
+      "path": "packs/roll20-npcs",
+      "type": "Actor",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "theurgy",
+      "label": "Теургия (Magic)",
+      "path": "packs/theurgy",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "low-magic",
+      "label": "Низшая Магия (Low Magic)",
+      "path": "packs/low-magic",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "default-enemies",
+      "label": "Враги (Default Enemies)",
+      "path": "packs/default-enemies",
+      "type": "Actor",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "arkhem-secrets",
+      "label": "Секреты Аркема (Таланты/Кибернетика/Стили)",
+      "path": "packs/arkhem-secrets",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "arkhem-reference",
+      "label": "Секреты Аркема: Справочники (Смертные Герои/Божества/Рай/Богоходы)",
+      "path": "packs/arkhem-reference",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "artifacts",
+      "label": "Артефакты (примеры)",
+      "path": "packs/artifacts",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "factions",
+      "label": "Фракции (примеры)",
+      "path": "packs/factions",
+      "type": "Actor",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "languages": [
+    {"lang": "en", "name": "English", "path": "lang/en.json"},
+    {"lang": "ru", "name": "Русский", "path": "lang/ru.json"}
+  ],
+  "grid": {
+    "distance": 5,
+    "units": "ft"
+  },
+  "primaryTokenAttribute": "computed.hp.bar",
+  "secondaryTokenAttribute": "computed.armor.bar"
+}

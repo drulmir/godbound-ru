@@ -1,0 +1,61 @@
+<div class="godbound chat-block gb-card gb-card--damage">
+    <h2 class="gb-title"><span class="gb-title__text">{{title}}</span></h2>
+
+    <div class="gb-actor">
+        <div class="gb-portraits">
+            <img class="gb-portrait" src="{{data.actor.img}}" alt="" title="{{data.actor.name}}">
+            <img class="gb-portrait" src="{{data.itemImg}}" alt="" title="{{data.item.name}}">
+        </div>
+        <div class="gb-names">
+            <span class="gb-name" title="{{data.item.name}}">{{data.item.name}}</span>
+            <span class="gb-sub" title="{{data.actor.name}}">{{data.actor.name}}</span>
+        </div>
+    </div>
+
+    <div class="blindable" data-blind="{{data.roll.blindroll}}">
+        {{{roll}}}
+
+        <div class="gb-stats">
+            <div class="gb-stat">
+                <span class="gb-stat__label">Обычный урон</span>
+                <span class="gb-stat__value">{{result.normalDamage}}</span>
+            </div>
+            <div class="gb-stat">
+                <span class="gb-stat__label">Прямой урон</span>
+                <span class="gb-stat__value">{{result.straightDamage}}</span>
+            </div>
+        </div>
+    </div>
+
+    {{#if data.saveType}}
+    <div class="gb-note">Спасбросок: <b>{{data.saveLabel}}</b> — успех уменьшает урон вдвое (бросается автоматически при применении).</div>
+    {{/if}}
+
+    <div class="gb-actions">
+        {{#if data.targets.length}}
+        {{!-- Подсказка про «каждую цель отдельно» осмысленна только когда целей
+              действительно несколько. Кость Схватки и обычный урон по одной
+              цели подставляют ровно один элемент — тогда подсказка не нужна. --}}
+        {{#ifneq data.targets.length 1}}
+        <div class="gb-hint">Урон применяется к каждой цели отдельно.</div>
+        {{/ifneq}}
+        <div class="gb-targets">
+            {{#each data.targets as |t id|}}
+            <div class="gb-target-row">
+                <span class="gb-target-row__name" title="{{t.name}}">{{t.name}}</span>
+                <div class="gb-btns">
+                    <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../result.normalDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}" data-save-type="{{../data.saveType}}">Обычный</button>
+                    <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../result.straightDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}" data-save-type="{{../data.saveType}}">Прямой</button>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        {{else}}
+        <div class="gb-hint">Цель не выбрана — урон применится к текущей выделенной цели.</div>
+        <div class="gb-btns">
+            <button type="button" class="gb-btn apply-damage-btn" data-amount="{{result.normalDamage}}" data-damage-type="{{data.damageType}}" data-is-magic="{{data.isMagic}}" data-save-type="{{data.saveType}}">Обычный урон</button>
+            <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-amount="{{result.straightDamage}}" data-damage-type="{{data.damageType}}" data-is-magic="{{data.isMagic}}" data-save-type="{{data.saveType}}">Прямой урон</button>
+        </div>
+        {{/if}}
+    </div>
+</div>

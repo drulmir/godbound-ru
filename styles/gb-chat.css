@@ -1,0 +1,928 @@
+/* ============================================================================
+   GODBOUND — единая система оформления чата
+   ----------------------------------------------------------------------------
+   Один общий вид для ВСЕХ сообщений системы в чате: атаки, урон, проверки,
+   спасброски, мораль, силы/дары, теургия, фракции, служебные уведомления.
+
+   Принципы:
+     • Карточка никогда не выходит за рамки колонки чата
+       (width:100%, box-sizing:border-box, min-width:0, overflow-wrap).
+     • Всё стоит ровно: сетки вместо text-align:right и «плавающих» кнопок.
+     • Ноль инлайновых стилей в шаблонах — только классы отсюда.
+     • Тема — пергамент/золото/чернила, как на листах персонажей.
+
+   Подключается ПОСЛЕ gb.css (см. system.json), поэтому перекрывает
+   «протекающие» правила `.godbound input {…}`, `.godbound h3 {…}` и т.п.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   1. Токены темы
+   --------------------------------------------------------------------------- */
+.godbound.chat-block {
+  --gb-ink:        #2f2418;
+  --gb-ink-soft:   #6b5940;
+  --gb-gold:       #b8860b;
+  --gb-gold-dark:  #8a6d1f;
+  --gb-line:       #b9a06a;
+  --gb-line-soft:  rgba(160, 125, 60, 0.42);
+  --gb-parchment:  #f4ecd7;
+  --gb-inset:      rgba(255, 252, 240, 0.55);
+  --gb-ok:         #1c6410;
+  --gb-ok-bg:      rgba(60, 140, 40, 0.15);
+  --gb-ok-line:    rgba(60, 130, 40, 0.5);
+  --gb-bad:        #92150c;
+  --gb-bad-bg:     rgba(170, 40, 30, 0.13);
+  --gb-bad-line:   rgba(165, 45, 35, 0.48);
+
+  /* Цветовая метка типа карточки — тонкая полоса сверху. */
+  --gb-accent:     #8a6d1f;
+}
+
+/* ---------------------------------------------------------------------------
+   2. Каркас карточки
+   --------------------------------------------------------------------------- */
+.godbound.chat-block {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 10px 9px;
+  overflow: hidden;                     /* ничто не вылезает за рамку */
+  border: 1px solid var(--gb-gold-dark);
+  border-top: 3px solid var(--gb-accent);
+  border-radius: 6px;
+  background-color: var(--gb-parchment);
+  background-image: url('../assets/parchment.jpg');
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 253, 244, 0.5),
+    inset 0 0 20px rgba(120, 90, 45, 0.16),
+    0 1px 3px rgba(0, 0, 0, 0.32);
+  color: var(--gb-ink);
+  font-family: 'Palatino Linotype', 'Book Antiqua', Constantia, Georgia, serif;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: left;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Ни один потомок не может «распереть» сетку или flex-строку.
+   ---------------------------------------------------------------------------
+   ВАЖНО про `:not(.dice-roll, .dice-roll *)`. Стили ядра живут в каскадных
+   слоях (@layer blocks.base), а наш файл — вне слоёв, и НЕслоёное правило
+   перебивает слоёное независимо от специфичности. Поэтому даже такой
+   «безобидный» селектор со специфичностью (0,2,0) обыгрывал
+   `.dice-tooltip .dice-rolls .roll { min-width: 24px }` (0,3,0) из ядра:
+   фишка кубика сжималась до ширины цифры (8px), а картинка грани всё равно
+   рисовалась 24×24 — соседние кубики налезали друг на друга и выглядели
+   обрезанными слева. Разметку броска ядро рисует само, ей наша страховка не
+   нужна — исключаем её целиком. */
+.godbound.chat-block *,
+.godbound.chat-block *::before,
+.godbound.chat-block *::after {
+  box-sizing: border-box;
+}
+.godbound.chat-block *:not(.dice-roll, .dice-roll *) {
+  min-width: 0;
+}
+
+/* Медиа и таблицы из описаний предметов держим внутри карточки. */
+.godbound.chat-block img,
+.godbound.chat-block video {
+  max-width: 100%;
+  height: auto;
+}
+/* Ядро задаёт таблицам width:100% и ячейкам padding .5rem 1rem (32px на
+   ячейку) — в колонке 272px это гарантированный вылет. Ужимаем и разрешаем
+   горизонтальную прокрутку внутри карточки вместо обрезки. */
+.godbound.chat-block table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 12px;
+}
+.godbound.chat-block th,
+.godbound.chat-block td {
+  padding: 2px 6px;
+}
+
+/* Длинные неразрывные строки (URL, формулы) не должны рвать карточку. */
+.godbound.chat-block pre,
+.godbound.chat-block code {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* gb.css вешает курсор-палец на ВСЕ <i> (`.godbound i { cursor: pointer }`),
+   из-за чего в чате «кликабельными» выглядели и чисто декоративные значки.
+   `inherit` вместо жёсткого `default` решает это в обе стороны: иконка внутри
+   кнопки или ссылки берёт палец у родителя, а сама по себе — обычную стрелку.
+   Так не нужен список исключений, который легко забыть пополнить. */
+.godbound.chat-block i {
+  cursor: inherit;
+}
+
+/* Итог броска подкрашивает карточку целиком — мягкой заливкой поверх текстуры. */
+.godbound.chat-block.result-msg-success {
+  background-image:
+    linear-gradient(rgba(72, 132, 44, 0.13), rgba(72, 132, 44, 0.13)),
+    url('../assets/parchment.jpg');
+  border-color: #6f8a3c;
+  border-top-color: var(--gb-accent);
+}
+.godbound.chat-block.result-msg-failure {
+  background-image:
+    linear-gradient(rgba(150, 45, 32, 0.12), rgba(150, 45, 32, 0.12)),
+    url('../assets/parchment.jpg');
+  border-color: #9a5442;
+  border-top-color: var(--gb-accent);
+}
+
+/* Цветные метки типов карточек. */
+.godbound.chat-block.gb-card--attack    { --gb-accent: #8c2f22; }
+.godbound.chat-block.gb-card--damage    { --gb-accent: #a33b16; }
+.godbound.chat-block.gb-card--save      { --gb-accent: #2f5f86; }
+.godbound.chat-block.gb-card--check     { --gb-accent: #5b3f8a; }
+.godbound.chat-block.gb-card--morale    { --gb-accent: #96701b; }
+.godbound.chat-block.gb-card--power     { --gb-accent: #b8860b; }
+.godbound.chat-block.gb-card--faction   { --gb-accent: #2b4c6f; }
+.godbound.chat-block.gb-card--fury      { --gb-accent: #8c1d10; }
+.godbound.chat-block.gb-card--rest      { --gb-accent: #4a7a4e; }
+.godbound.chat-block.gb-card--tactics   { --gb-accent: #4d4438; }
+.godbound.chat-block.gb-card--info      { --gb-accent: #8a6d1f; }
+
+/* ---------------------------------------------------------------------------
+   3. Заголовок
+   --------------------------------------------------------------------------- */
+.godbound.chat-block .gb-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 7px;
+  padding: 0 0 5px;
+  border: none;
+  border-bottom: 1px solid var(--gb-line);
+  color: var(--gb-gold-dark);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+/* Декоративные линейки по краям — сжимаются, поэтому длинный заголовок
+   никогда не выталкивает их за границу карточки. */
+.godbound.chat-block .gb-title::before,
+.godbound.chat-block .gb-title::after {
+  content: "";
+  flex: 0 1 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gb-line));
+}
+.godbound.chat-block .gb-title::after {
+  background: linear-gradient(270deg, transparent, var(--gb-line));
+}
+.godbound.chat-block .gb-title__text {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* Значки под заголовком (Усилие: по желанию / на сцену / на день, Кара …). */
+.godbound.chat-block .gb-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: -2px 0 7px;
+}
+/* Шаблон всегда выводит контейнер значков; если ни одного не выпало —
+   он полностью убирается, чтобы не оставлять «дыру» под заголовком. */
+.godbound.chat-block .gb-tags:not(:has(.gb-tag)) {
+  display: none;
+}
+.godbound.chat-block .gb-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border: 1px solid var(--gb-line);
+  border-radius: 999px;
+  background: var(--gb-inset);
+  color: var(--gb-ink-soft);
+  font-size: 10px;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.godbound.chat-block .gb-tag i {
+  color: var(--gb-gold-dark);
+  font-size: 10px;
+}
+.godbound.chat-block .gb-tag--smite {
+  border-color: rgba(160, 45, 30, 0.55);
+  background: rgba(170, 50, 35, 0.1);
+  color: #8c1d10;
+}
+.godbound.chat-block .gb-tag--smite i {
+  color: #8c1d10;
+}
+
+/* ---------------------------------------------------------------------------
+   4. Строка «кто / чем»
+   --------------------------------------------------------------------------- */
+.godbound.chat-block .gb-actor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  padding: 5px 7px;
+  border: 1px solid var(--gb-line-soft);
+  border-radius: 5px;
+  background: var(--gb-inset);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.godbound.chat-block .gb-actor + .gb-actor {
+  margin-top: -2px;
+}
+
+.godbound.chat-block .gb-portraits {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+.godbound.chat-block .gb-portraits .gb-portrait + .gb-portrait {
+  margin-left: -10px;                   /* лёгкое наложение медальонов */
+}
+
+/* Портрет — настоящий <img>, а не background-image в атрибуте style.
+   Причина не косметическая: путь к картинке подставляется в разметку, и в
+   CSS-строке url('...') апостроф в имени файла («Kali's Avatar.webp»)
+   обрывал бы значение — HTML-экранирование тут не спасает, потому что
+   парсер HTML возвращает апостроф ДО того, как строку увидит парсер CSS.
+   У атрибута src такой проблемы нет. */
+.godbound.chat-block .gb-portrait {
+  display: block;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--gb-gold);
+  border-radius: 50%;
+  background-color: #efe6cf;
+  box-shadow: 0 0 0 1px #5b4420, 0 1px 3px rgba(0, 0, 0, 0.45);
+  object-fit: cover;
+  object-position: center top;
+}
+.godbound.chat-block .gb-portrait--sm {
+  width: 28px;
+  height: 28px;
+  border-width: 1px;
+}
+
+.godbound.chat-block .gb-names {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+/* Имена переносятся и обрезаются ПО ВЕРТИКАЛИ (многоточие в конце второй
+   строки), а не по горизонтали: длинное имя вроде «Архидемон Бездны
+   Гхаал-Ксарратх Пожиратель Солнц» читается целиком, вместо того чтобы
+   превратиться в «Архидемон Бе…». Горизонтального выхода за рамку при этом
+   нет вовсе — перенос делает ширину строки заведомо не больше колонки. */
+.godbound.chat-block .gb-name {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.godbound.chat-block .gb-name .gb-magic {
+  color: var(--gb-gold-dark);
+  font-size: 11px;
+  vertical-align: super;
+}
+.godbound.chat-block .gb-sub {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: var(--gb-ink-soft);
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.25;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Строка цели: стрелка + маленький портрет + имя. */
+.godbound.chat-block .gb-actor--target {
+  padding: 4px 7px;
+  background: rgba(255, 250, 235, 0.35);
+}
+.godbound.chat-block .gb-arrow {
+  flex: 0 0 auto;
+  color: var(--gb-gold-dark);
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+   5. Бросок кубов (разметка ядра Foundry внутри карточки)
+   --------------------------------------------------------------------------- */
+.godbound.chat-block .dice-roll {
+  margin: 6px 0 0;
+}
+.godbound.chat-block .dice-roll + .dice-roll {
+  margin-top: 5px;
+}
+.godbound.chat-block .dice-result {
+  margin: 0;
+}
+.godbound.chat-block .dice-formula {
+  margin: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--gb-line-soft);
+  border-radius: 4px;
+  background: rgba(255, 252, 240, 0.6);
+  box-shadow: none;
+  color: var(--gb-ink-soft);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+.godbound.chat-block .dice-total {
+  margin: 4px 0 0;
+  padding: 2px 6px;
+  border: 1px solid var(--gb-gold-dark);
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(255, 253, 246, 0.9), rgba(233, 220, 186, 0.9));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  color: var(--gb-ink);
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  word-break: normal;
+}
+.godbound.chat-block .dice-total.success {
+  border-color: var(--gb-ok-line);
+  background: linear-gradient(180deg, rgba(226, 240, 214, 0.95), rgba(190, 216, 172, 0.95));
+  color: var(--gb-ok);
+}
+.godbound.chat-block .dice-total.failure {
+  border-color: var(--gb-bad-line);
+  background: linear-gradient(180deg, rgba(246, 223, 217, 0.95), rgba(224, 186, 178, 0.95));
+  color: var(--gb-bad);
+}
+.godbound.chat-block .dice-tooltip {
+  margin: 4px 0 0;
+}
+/* Пояс и подтяжки к исключению выше: размеры фишек кубиков задаём явно, чтобы
+   грань 24×24 всегда попадала в свой элемент, даже если сюда когда-нибудь
+   доберётся ещё одно наше правило. */
+.godbound.chat-block .dice-tooltip .dice-rolls .roll {
+  min-width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+.godbound.chat-block .dice-tooltip .part-formula,
+.godbound.chat-block .dice-tooltip .part-total {
+  color: var(--gb-ink-soft);
+  font-size: 12px;
+}
+.godbound.chat-block .dice-tooltip .wrapper {
+  margin: 0;
+}
+
+/* «Формула урона» и прочие кликабельные подсказки текстом. */
+.godbound.chat-block .damage-formula-roll,
+.godbound.chat-block .instant-auto-save {
+  border-bottom: 1px dashed currentColor;
+  color: #8c2f22;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+.godbound.chat-block .damage-formula-roll:hover,
+.godbound.chat-block .instant-auto-save:hover {
+  color: var(--gb-gold-dark);
+  text-shadow: 0 0 4px rgba(184, 134, 11, 0.5);
+}
+.godbound.chat-block .gb-autosave {
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   6. Вердикт и числовые плашки
+   --------------------------------------------------------------------------- */
+.godbound.chat-block .gb-verdict {
+  display: block;
+  margin: 6px 0 0;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-align: center;
+}
+/* Успех и провал различаются НЕ ТОЛЬКО цветом: у каждого свой знак и своя
+   толщина рамки. Так итог броска читается и при дальтонизме, и боковым
+   зрением через всю комнату. */
+.godbound.chat-block .gb-verdict--ok {
+  border-color: var(--gb-ok-line);
+  background: var(--gb-ok-bg);
+  color: var(--gb-ok);
+}
+.godbound.chat-block .gb-verdict--bad {
+  border-style: dashed;
+  border-color: var(--gb-bad-line);
+  background: var(--gb-bad-bg);
+  color: var(--gb-bad);
+}
+.godbound.chat-block .gb-verdict--ok::before,
+.godbound.chat-block .gb-verdict--bad::before {
+  margin-right: 6px;
+  font-variant: normal;
+  font-weight: 700;
+}
+.godbound.chat-block .gb-verdict--ok::before  { content: "✔"; }
+.godbound.chat-block .gb-verdict--bad::before { content: "✘"; }
+.godbound.chat-block .gb-verdict__target {
+  color: var(--gb-ink-soft);
+  font-size: 11px;
+  font-variant: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Пары «Обычный / Прямой» — всегда одинаковой ширины, всегда по центру.
+   auto-fit + min(): две колонки, когда места хватает, и одна — когда нет.
+   `min(96px, 100%)` гарантирует, что в очень узком чате колонка не вылезет. */
+.godbound.chat-block .gb-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(96px, 100%), 1fr));
+  gap: 6px;
+  margin: 6px 0 0;
+}
+.godbound.chat-block .gb-stats--1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+.godbound.chat-block .gb-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 3px 5px;
+  border: 1px solid var(--gb-line-soft);
+  border-radius: 5px;
+  background: var(--gb-inset);
+  text-align: center;
+}
+.godbound.chat-block .gb-stat__label {
+  color: var(--gb-ink-soft);
+  font-size: 10px;
+  font-variant: small-caps;
+  letter-spacing: 0.07em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.godbound.chat-block .gb-stat__value {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+  word-break: normal;
+}
+
+/* ---------------------------------------------------------------------------
+   7. Текстовые блоки
+   --------------------------------------------------------------------------- */
+.godbound.chat-block .gb-note,
+.godbound.chat-block .gb-hint {
+  margin: 6px 0 0;
+  color: var(--gb-ink-soft);
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.3;
+  text-align: center;
+}
+.godbound.chat-block .gb-hint {
+  margin: 0 0 5px;
+}
+
+.godbound.chat-block .gb-desc {
+  margin: 6px 0 0;
+  padding: 6px 8px;
+  border: 1px solid var(--gb-line-soft);
+  border-radius: 5px;
+  background: var(--gb-inset);
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: normal;
+}
+.godbound.chat-block .gb-desc--pre {
+  white-space: pre-wrap;
+}
+.godbound.chat-block .gb-desc > :first-child { margin-top: 0; }
+.godbound.chat-block .gb-desc > :last-child  { margin-bottom: 0; }
+.godbound.chat-block .gb-desc p { margin: 0 0 6px; }
+.godbound.chat-block .gb-desc ol {
+  margin: 0 0 6px;
+  padding-left: 18px;
+}
+/* Маркированные списки в описаниях получают тот же золотой ромб, что и
+   служебные списки карточек — вместо 24px отступа из ядра. */
+.godbound.chat-block .gb-desc ul {
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+.godbound.chat-block .gb-desc ul > li {
+  position: relative;
+  padding-left: 14px;
+}
+/* Общий маркер списков. line-height берётся от строки текста (inherit), а не
+   магическим числом, поэтому ромб стоит на одной высоте и в описаниях
+   предметов, и в служебных списках карточек. */
+.godbound.chat-block .gb-desc ul > li::before,
+.godbound.chat-block .gb-list li::before {
+  position: absolute;
+  top: 0;
+  left: 1px;
+  color: var(--gb-gold);
+  content: "◆";
+  font-size: 8px;
+  line-height: inherit;
+}
+
+.godbound.chat-block .gb-lines {
+  margin: 6px 0 0;
+}
+.godbound.chat-block .gb-lines p {
+  margin: 0 0 4px;
+  line-height: 1.35;
+}
+.godbound.chat-block .gb-lines p:last-child { margin-bottom: 0; }
+
+/* Списки получают золотой ромб вместо стандартного маркера — так они
+   держат тему и не зависят от отступа списка в ядре (1.5em). */
+.godbound.chat-block .gb-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.godbound.chat-block .gb-list li {
+  position: relative;
+  margin: 0 0 3px;
+  padding-left: 14px;
+  line-height: 1.35;
+}
+.godbound.chat-block .gb-list li:last-child { margin-bottom: 0; }
+
+.godbound.chat-block .gb-ok   { color: var(--gb-ok);  font-weight: 700; }
+.godbound.chat-block .gb-fail { color: var(--gb-bad); font-weight: 700; }
+
+/* Нормализация типографики ядра внутри карточки. */
+.godbound.chat-block p { margin: 0 0 6px; }
+.godbound.chat-block p:last-child { margin-bottom: 0; }
+.godbound.chat-block h2,
+.godbound.chat-block h3,
+.godbound.chat-block h4 {
+  font-family: inherit;
+}
+.godbound.chat-block .gb-subtitle {
+  margin: 6px 0 0;
+  color: var(--gb-gold-dark);
+  font-size: 12px;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   8. Кнопки и блок действий
+   --------------------------------------------------------------------------- */
+.godbound.chat-block .gb-actions {
+  margin: 7px 0 0;
+  padding: 6px 0 0;
+  border-top: 1px dashed var(--gb-line);
+}
+.godbound.chat-block .gb-btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(118px, 100%), 1fr));
+  gap: 5px;
+  align-items: stretch;
+}
+.godbound.chat-block .gb-btns--1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+.godbound.chat-block .gb-btns + .gb-btns {
+  margin-top: 5px;
+}
+
+/* Высокая специфичность: перебивает `.godbound input {background:…}` из gb.css
+   и стили кнопок ядра Foundry. Работает и для <button>, и для устаревших
+   <input type="button"> в уже существующих сообщениях чата. */
+.godbound.chat-block .gb-btn,
+.godbound.chat-block input[type="button"],
+.godbound.chat-block button {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  min-height: 26px;
+  margin: 0;
+  padding: 4px 7px;
+  border: 1px solid var(--gb-gold-dark);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #f8f1de 0%, #ddcfa8 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.22);
+  color: var(--gb-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition: filter 0.12s ease, box-shadow 0.12s ease;
+  white-space: normal;                  /* длинные подписи переносятся, не режутся */
+  word-break: break-word;
+}
+.godbound.chat-block .gb-btn:hover,
+.godbound.chat-block input[type="button"]:hover,
+.godbound.chat-block button:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 0 5px rgba(184, 134, 11, 0.55);
+  filter: brightness(1.05);
+}
+.godbound.chat-block .gb-btn:active,
+.godbound.chat-block input[type="button"]:active,
+.godbound.chat-block button:active {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  filter: brightness(0.97);
+}
+
+/* Акцентные варианты. */
+.godbound.chat-block .gb-btn--danger {
+  border-color: #8c3a2a;
+  background: linear-gradient(180deg, #f6e3dc 0%, #dcb3a6 100%);
+  color: #6d1c10;
+}
+.godbound.chat-block .gb-btn--primary {
+  border-color: #7d621a;
+  background: linear-gradient(180deg, #f7e9bf 0%, #d9bd6a 100%);
+}
+
+/* Кнопка урона после применения — зелёная, но остаётся кликабельной. */
+.godbound.chat-block .apply-damage-btn.used,
+.godbound.chat-block .gb-btn.used {
+  border-color: #3f7a33;
+  background: linear-gradient(180deg, #cde6c3 0%, #93c186 100%);
+  color: #163d0f;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.godbound.chat-block .gb-btn__note {
+  display: block;
+  color: #245417;
+  font-size: 10px;
+  font-variant: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.godbound.chat-block .gb-btn__note:empty {
+  display: none;
+}
+
+/* Вспышка при КАЖДОМ применении урона: одна и та же кнопка используется
+   подряд по нескольким целям, и без неё повторный клик выглядел бы так же,
+   как непопавший по кнопке промах мышью. */
+@keyframes gb-btn-flash {
+  from { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 10px 3px rgba(76, 175, 80, 0.95); }
+  to   { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 1px 2px rgba(0, 0, 0, 0.22); }
+}
+.godbound.chat-block .gb-btn--flash {
+  animation: gb-btn-flash 0.45s ease-out;
+}
+
+/* Урон по каждой цели отдельно. */
+.godbound.chat-block .gb-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 5px 0 0;
+}
+.godbound.chat-block .gb-target-row {
+  padding: 5px 6px 6px;
+  border: 1px solid var(--gb-line-soft);
+  border-radius: 5px;
+  background: rgba(255, 252, 240, 0.42);
+}
+/* Внутри строки цели полезной ширины меньше на её паддинги, а подписи там
+   короткие («Обычный»/«Прямой») — поэтому порог колонки ниже, и две кнопки
+   по-прежнему помещаются в ряд. */
+.godbound.chat-block .gb-target-row .gb-btns {
+  grid-template-columns: repeat(auto-fit, minmax(min(86px, 100%), 1fr));
+}
+.godbound.chat-block .gb-target-row__name {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  margin: 0 0 4px;
+  color: var(--gb-ink-soft);
+  font-size: 12px;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* ---------------------------------------------------------------------------
+   9. Ссылки-обогащения ядра (@UUID, инлайн-броски) на пергаменте
+   --------------------------------------------------------------------------- */
+.godbound.chat-block a.content-link,
+.godbound.chat-block a.inline-roll {
+  padding: 0 3px;
+  border: 1px solid var(--gb-line-soft);
+  border-radius: 3px;
+  background: rgba(255, 252, 240, 0.6);
+  color: var(--gb-gold-dark);
+  font-size: 12px;
+  white-space: normal;
+}
+.godbound.chat-block a.content-link:hover,
+.godbound.chat-block a.inline-roll:hover {
+  border-color: var(--gb-gold);
+  text-shadow: 0 0 4px rgba(184, 134, 11, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+   10. Диалоги системы — тот же язык форм, что и карточки чата
+   --------------------------------------------------------------------------- */
+.godbound.gb-dialog {
+  color: var(--gb-ink, #2f2418);
+  font-family: 'Palatino Linotype', 'Book Antiqua', Constantia, Georgia, serif;
+}
+.godbound.gb-dialog .gb-dialog__title {
+  margin: 0 0 6px;
+  padding: 0 0 4px;
+  border: none;
+  border-bottom: 1px solid #b9a06a;
+  color: #8a6d1f;
+  font-family: inherit;
+  font-size: 16px;
+  font-variant: small-caps;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+/* Сюда попадает сырое item.system.description из <textarea> — сохраняем
+   его абзацы, иначе выбор Усилия делается вслепую по сплошной простыне. */
+.godbound.gb-dialog .gb-dialog__text {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.godbound.gb-dialog select,
+.godbound.gb-dialog input[type="number"],
+.godbound.gb-dialog input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 28px;
+  padding: 2px 6px;
+  border: 1px solid #b9a06a;
+  border-radius: 3px;
+  background: rgba(255, 249, 233, 0.75);
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+}
+.godbound.gb-dialog select:focus,
+.godbound.gb-dialog input:focus {
+  border-color: #b8860b;
+  box-shadow: 0 0 4px rgba(184, 134, 11, 0.55);
+  outline: none;
+}
+
+/* ---------------------------------------------------------------------------
+   10.5 Совместимость со СТАРЫМИ сообщениями
+   ---------------------------------------------------------------------------
+   Сообщения, отправленные до этого обновления, уже сохранены в базе мира и
+   перерисовать их нельзя. Они несут прежнюю разметку, у которой две беды:
+
+     1) внешний `<section class="godbound chat-message">` — класс ядра, из-за
+        которого старая карточка получала ВТОРУЮ рамку, фон и отступы ядра
+        внутри уже существующей рамки сообщения (полезная ширина падала с
+        272 до 244px);
+     2) `<input type="button">` без стилей — ядро их вообще не оформляет, а
+        UA-правило `white-space: pre` не даёт подписи переноситься, поэтому
+        две длинные русские подписи вылезали за колонку.
+
+   Пункт 2 уже исправлен правилами кнопок выше (они охватывают и input).
+   Здесь снимаем двойную рамку из пункта 1.
+   --------------------------------------------------------------------------- */
+.message-content .godbound.chat-message {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Старые внутренние блоки: не дать им выйти за рамку. */
+.godbound.chat-block .chat-actor,
+.godbound.chat-block .chat-title,
+.godbound.chat-block .chat-details,
+.godbound.chat-block .roll-result {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.godbound.chat-block .chat-img {
+  height: 42px;                         /* без этого align-items:center схлопывал портрет в 0 */
+  border-radius: 4px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ---------------------------------------------------------------------------
+   10.7 Мелкие фрагменты интерфейса, которые система дорисовывает сама
+   ---------------------------------------------------------------------------
+   Раньше эти два элемента несли встроенный style="..." прямо в gb.js.
+   Здесь они собраны рядом с остальным оформлением, чтобы вид системы правился
+   в одном месте, а не в JS.
+   --------------------------------------------------------------------------- */
+
+/* Счётчик Усилия над токеном (третьей полосы ресурсов в HUD нет). */
+.gb-effort-hud {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  padding: 1px 6px;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 0 0 3px #000;
+  white-space: nowrap;
+}
+
+/* Кнопка «Импорт персонажа» в боковой панели «Актёры». */
+button.godbound-import-actor {
+  flex: 0 0 auto;
+  width: calc(100% - 8px);
+  margin: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   11. Все три точки вывода чата ведут себя одинаково
+   ---------------------------------------------------------------------------
+   Foundry рисует сообщения в трёх местах:
+     • ol.chat-log в боковой панели      — полезная ширина ~272px;
+     • #chat-notifications (свёрнутая панель) — те же ~272px;
+     • .chat-popout (отдельное окно)      — ~280px и шире при растягивании.
+   Ядро жёстко проставляет им `themed theme-light`, поэтому отдельная тёмная
+   тема для карточек не нужна: чат всегда светлый.
+   --------------------------------------------------------------------------- */
+.chat-log .godbound.chat-block,
+.chat-popout .godbound.chat-block,
+#chat-notifications .godbound.chat-block {
+  width: 100%;
+}

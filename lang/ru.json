@@ -1,0 +1,23 @@
+{
+  "TYPES.Actor.pc": "Персонаж",
+  "TYPES.Actor.npc": "НИП",
+  "TYPES.Actor.faction": "Фракция",
+  "TYPES.Item.autoHitAttack": "Авто-атака",
+  "TYPES.Item.multiDieDamageRoll": "Атака (много костей)",
+  "TYPES.Item.attack": "Атака",
+  "TYPES.Item.project": "Проект",
+  "TYPES.Item.item": "Предмет",
+  "TYPES.Item.boundWord": "Слово",
+  "TYPES.Item.divineGift": "Дар",
+  "TYPES.Item.divineMiracle": "Чудо",
+  "TYPES.Item.artifact": "Артефакт",
+  "TYPES.Item.artifactPower": "Дар артефакта",
+  "TYPES.Item.treasure": "Сокровище",
+  "TYPES.Item.invocation": "Воззвание",
+  "TYPES.Item.tactic": "Тактика",
+  "TYPES.Item.cult": "Культ",
+  "TYPES.Item.art": "Искусство",
+  "TYPES.Item.artLevel": "Уровень",
+  "TYPES.Item.fact": "Факт",
+  "TYPES.Item.language": "Язык"
+}

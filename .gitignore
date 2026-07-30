@@ -1,0 +1,26 @@
+# IDE
+.idea/
+.vs/
+
+# Orchestration / tooling state (must never ship)
+.omc/
+.claude/
+CLAUDE.md
+AGENTS.md
+
+# Legacy dev notes
+TODO.md
+
+# Ad-hoc backups (keep out of the shipped system tree)
+*-backup/
+*.bak
+_sheet-backup/
+
+# Generated / dev-only style artifacts
+*.css.map
+styles/gb.less
+
+# Archives & OS cruft
+*.zip
+.DS_Store
+Thumbs.db

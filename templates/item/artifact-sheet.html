@@ -1,0 +1,208 @@
+<form class="{{cssClass}} artifact" autocomplete="off">
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="attrs">Хар-ки</a>
+        <a class="item" data-tab="powers">Силы</a>
+    </nav>
+
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Артефакт</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="description">Описание:</label>
+                            <textarea id="description" name="system.description">{{system.description}}</textarea>
+                        </div>
+                        <div>
+                            <label for="effortTotal">Усилие:</label>
+                            <input id="effortTotal" name="system.effort.total" type="text" value="{{system.effort.total}}" data-dtype="Number"/>
+                        </div>
+                        <div>
+                            <label>Задействовано:</label>
+                            <div style="display: flex; align-items: center;padding-bottom:16px;">
+                                <div style="width:22%;text-align: right;">
+                                    <i class="fas fa-stopwatch"></i>:
+                                    <input id="effortAtWill" name="system.effort.atWill" type="text" value="{{system.effort.atWill}}" data-dtype="Number" class="compact" />
+                                </div>
+                                <div style="width:25%;text-align: right;">
+                                    <i class="fas fa-clock"></i>:
+                                    <input id="effortScene" name="system.effort.scene" type="text" value="{{system.effort.scene}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:28%;text-align: right;">
+                                    <i class="fas fa-sun"></i>:
+                                    <input id="effortDay" name="system.effort.day" type="text" value="{{system.effort.day}}" data-dtype="Number" class="compact"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Домино:</label>
+                            <div style="display: flex; align-items: center;justify-content: space-around">
+                                <div style="width:22%;text-align: right;">
+                                    Цена:
+                                    <input id="dominionCost" name="system.dominionCost" type="text" value="{{system.dominionCost}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:25%;text-align: right;">
+                                    Оплачено:
+                                    <input id="committedDominion" name="system.committedDominion" type="text" value="{{system.committedDominion}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:28%;text-align: right;">
+                                    Внесено:
+                                    <input id="contributedDominion" name="system.contributedDominion" type="text" value="{{system.contributedDominion}}" data-dtype="Number" class="compact"/>
+                                </div>
+                                <div style="width:22%;text-align: right;padding-right:8px;">
+                                    <label>Rem: {{system.computed.remaining}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display: flex; align-items: center;padding-top:16px;">
+                                <input type="checkbox" name="system.completed" {{checked system.completed}} style="margin-left:0" />Завершён
+                                <input type="checkbox" name="system.bound" {{checked system.bound}} style="margin-left:16px" />Связан (постоянно, держит 1 Усилие по желанию)
+                            </div>
+                        </div>
+                        <div>
+                            <label for="mortalEffect">Смертный эффект:</label>
+                            <textarea id="mortalEffect" name="system.mortalEffect">{{system.mortalEffect}}</textarea>
+                        </div>
+                        <div>
+                            <label for="effectType" title="Что делает кнопка броска у самого артефакта: бросок атаки против КБ цели, спасбросок цели (урон с возможностью половины), либо ничего (отказ).">Воздействие:</label>
+                            <select id="effectType" name="system.effectType">
+                                {{#select system.effectType}}
+                                <option value="none">Нет (отказ)</option>
+                                <option value="attack">Атака</option>
+                                <option value="save">Спасбросок</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        {{#ifeq system.effectType "attack"}}
+                        <div>
+                            <label for="attr">Хар-ка:</label>
+                            <select name="system.attr" id="attr">
+                                {{#select system.attr}}
+                                <option value="">—</option>
+                                <option value="str">Сил</option>
+                                <option value="dex">Лов</option>
+                                <option value="con">Тел</option>
+                                <option value="int">Инт</option>
+                                <option value="wis">Мдр</option>
+                                <option value="cha">Хар</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="hitBonus">Бонус попадания:</label>
+                            <input id="hitBonus" name="system.hitBonus" type="text" value="{{system.hitBonus}}" data-dtype="Number" class="compact"/>
+                        </div>
+                        {{/ifeq}}
+                        {{#ifeq system.effectType "save"}}
+                        <div>
+                            <label for="saveType" title="Спасбросок, который бросает цель. При успехе урон уменьшается вдвое.">Спасбросок цели:</label>
+                            <select id="saveType" name="system.saveType">
+                                {{#select system.saveType}}
+                                <option value="none">Нет</option>
+                                <option value="hardiness">Стойкость</option>
+                                <option value="evasion">Уклонение</option>
+                                <option value="spirit">Дух</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        {{/ifeq}}
+                        {{#if (or (eq system.effectType "attack") (eq system.effectType "save"))}}
+                        <div>
+                            <label for="damageRoll">Урон:</label>
+                            <div style="display: flex; align-items: center">
+                                <input id="damageRoll" name="system.damageRoll" type="text" value="{{system.damageRoll}}" placeholder="напр. 1d8" class="compactplus"/>
+                                +
+                                <input id="damageBonus" name="system.damageBonus" type="text" value="{{system.damageBonus}}" data-dtype="Number" class="compact"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="damageType">Тип урона:</label>
+                            <select name="system.damageType" id="damageType">
+                                {{#select system.damageType}}
+                                <option value="physical">Физический</option>
+                                <option value="fire">Огонь</option>
+                                <option value="cold">Холод</option>
+                                <option value="lightning">Молния</option>
+                                <option value="acid">Кислота</option>
+                                <option value="poison">Яд</option>
+                                <option value="disease">Болезнь</option>
+                                <option value="magic">Магия</option>
+                                <option value="holy">Свет</option>
+                                <option value="unholy">Тьма</option>
+                                {{/select}}
+                            </select>
+                        </div>
+                        <div>
+                            <label></label>
+                            <div style="display: flex; align-items: center">
+                                <input type="checkbox" name="system.magic" {{checked system.magic}} style="margin-left:0" />Магический урон
+                            </div>
+                        </div>
+                        {{/if}}
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab powers" data-group="primary" data-tab="powers">
+            <h2 style="display:flex;justify-content: space-between;">
+                <span>Дары</span>
+                <i class="fas fa-plus itemAdder" data-item-type="artifactPower"></i>
+            </h2>
+            <ol class="item-list">
+                    {{#each artifactPowers as |power id|}}
+                    {{#ifeq power.type "artifactPower"}}
+                    <li class="item flexrow" data-item-id="{{power.id}}">
+                        <h4 class="item-name">
+                            {{#if power.system.greater}}
+                            <span style="font-style: italic">{{power.name}}</span>
+                            {{/if}}
+                            {{#unless power.system.greater}}
+                            {{power.name}}
+                            {{/unless}}
+                            <span class="item-tags">
+                                {{#if power.system.instant}}
+                                    <a title="Мгновенно"><i class="fas fa-bolt"></i></a>
+                                {{/if}}
+                                {{#if power.system.onTurn}}
+                                    <a title="В свой ход"><i class="fas fa-redo-alt"></i></a>
+                                {{/if}}
+                                {{#if power.system.action}}
+                                    <a title="Действие"><i class="fas fa-hourglass-end"></i></a>
+                                {{/if}}
+                                {{#if power.system.smite}}
+                                    <a title="Кара"><i class="fas fa-meteor"></i></a>
+                                {{/if}}
+                            </span>
+                        </h4>
+                        <div class="item-controls">
+                            <a class="item-control item-expand" title="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                        </div>
+                    </li>
+                    <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{power.system.description}}</li>
+                    {{/ifeq}}
+                    {{/each}}
+                </ol>
+        </div>
+    </section>
+</form>
