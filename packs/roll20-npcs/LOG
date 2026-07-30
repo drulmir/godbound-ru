@@ -1,0 +1,8 @@
+2026/07/31-00:58:46.409 a644 Recovering log #235
+2026/07/31-00:58:46.412 a644 Delete type=0 #235
+2026/07/31-00:58:46.412 a644 Delete type=3 #233
+2026/07/31-00:58:46.507 b008 Moved #234 to level-1 2941 bytes OK: files[ 0 1 1 0 0 0 0 ]
+2026/07/31-00:58:46.519 b008 Compacting 1@1 + 1@2 files
+2026/07/31-00:58:46.534 b008 Generated table #238@1: 1198 keys, 861245 bytes
+2026/07/31-00:58:46.534 b008 Compacted 1@1 + 1@2 files => 861245 bytes
+2026/07/31-00:58:46.534 b008 compacted to: files[ 0 0 1 0 0 0 0 ]

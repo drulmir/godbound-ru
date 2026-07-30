@@ -692,7 +692,57 @@ export class GodboundActor extends Actor {
             data.distance = Math.hypot(radius, radius);
             data.direction = 45;
         }
-        await canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [data]);
+        try {
+            await this._placeZoneInteractive(data);
+        } catch (e) {
+            // Фолбэк: без интерактивного размещения просто ставим на токен.
+            console.warn('godbound | интерактивное размещение зоны недоступно, ставлю на токен', e);
+            await canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [data]);
+        }
+    }
+
+    // Ghost-preview placement: the template follows the cursor on the template
+    // layer; left click places it there, right click cancels.
+    async _placeZoneInteractive(data) {
+        const doc = new CONFIG.MeasuredTemplate.documentClass(data, {parent: canvas.scene});
+        const template = new CONFIG.MeasuredTemplate.objectClass(doc);
+        const initialLayer = canvas.activeLayer;
+        await template.draw();
+        canvas.templates.activate();
+        canvas.templates.preview.addChild(template);
+
+        return new Promise(resolve => {
+            let done = false;
+            const finish = () => {
+                if (done) return;
+                done = true;
+                canvas.stage.off('pointermove', onMove);
+                canvas.stage.off('pointerdown', onConfirm);
+                canvas.app.view.oncontextmenu = null;
+                template.destroy();
+                initialLayer?.activate();
+            };
+            const localPos = ev => ev.getLocalPosition
+                ? ev.getLocalPosition(canvas.templates)
+                : ev.data.getLocalPosition(canvas.templates);
+            const onMove = ev => {
+                ev.stopPropagation();
+                const pos = localPos(ev);
+                doc.updateSource({x: pos.x, y: pos.y});
+                template.refresh();
+            };
+            const onConfirm = async ev => {
+                if (ev.button !== 0) return;
+                const pos = localPos(ev);
+                finish();
+                await canvas.scene.createEmbeddedDocuments('MeasuredTemplate',
+                    [foundry.utils.mergeObject(data, {x: pos.x, y: pos.y})]);
+                resolve(true);
+            };
+            canvas.stage.on('pointermove', onMove);
+            canvas.stage.on('pointerdown', onConfirm);
+            canvas.app.view.oncontextmenu = () => { finish(); resolve(false); };
+        });
     }
 
     // Create the Attack item described inside a Divine Gift (e.g. «Рука-коса»)
