@@ -43,4 +43,4 @@ Godbound — игра о смертных, получивших искру бо�
 
 Система основана на оригинальном модуле Godbound для Foundry VTT авторства **jasonwocky** (MIT, © 2020).
 
-**Godbound** является собственностью Kevin Crawford / Sine Nomine Publishing. Этот проект — фанатская разработка и не содержит текста платных книг; используйте его вместе с официальными правилами. Бесплатная версия правил доступна на [DriveThruRPG](https://www.drivethrurpg.com/product/185959/Godbound-A-Game-of-Divine-Heroes-Free-Edition).
+**Godbound** является собственностью Kevin Crawford / Sine Nomine Publishing. Этот проект — фанатская разработка. Бесплатная версия правил доступна на [DriveThruRPG](https://www.drivethrurpg.com/product/185959/Godbound-A-Game-of-Divine-Heroes-Free-Edition).
