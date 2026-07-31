@@ -4,7 +4,7 @@
  */
 
 // Import Modules
-import {GodboundActor, isMobCardinality, bloodWaterGiftData, cardinalityTokenSize} from "./actor.js";
+import {GodboundActor, isMobCardinality, bloodWaterGiftData, cardinalityTokenSize, frayAttackData, fixGameIconPath} from "./actor.js";
 import {GodboundItem} from "./item.js";
 import {GodboundTokenDocument} from "./token.js";
 import {GodboundItemSheet} from "./item-sheet.js";
@@ -343,6 +343,9 @@ Hooks.once("init", async function () {
         let dmgType = $btn.data('damageType');
         let dmgIsMagic = $btn.data('isMagic');
         let hasDamage = dmgNormal !== undefined && dmgNormal !== '' && dmgNormal !== null;
+        // Damage FORMULA (power-use cards, e.g. an Art level with effectType=save):
+        // nothing is pre-rolled there, so the damage is rolled here on a failed save.
+        let dmgFormula = $btn.data('dmgFormula');
         let actor = game.user.character;
         if (!actor) {
             let controlled = canvas?.tokens?.controlled?.[0];
@@ -388,6 +391,7 @@ Hooks.once("init", async function () {
             templateData.data.actor = actor;
             // On a failed save, offer a one-click "Нанести урон" against the same
             // character that just rolled (the effect landed on them).
+            chatData.rolls = [roll];
             if (result.isFailure && hasDamage) {
                 templateData.data.damage = {
                     normal: dmgNormal,
@@ -396,9 +400,27 @@ Hooks.once("init", async function () {
                     isMagic: dmgIsMagic,
                     targetActorId: actor.id,
                 };
+            } else if (result.isFailure && dmgFormula) {
+                // No pre-rolled numbers on the card — roll the damage now.
+                const bonus = Number($btn.data('dmgBonus')) || 0;
+                const formula = bonus ? `${dmgFormula}${bonus > 0 ? '+' : ''}${bonus}` : String(dmgFormula);
+                try {
+                    const dmgRoll = new Roll(formula);
+                    await dmgRoll.evaluate();
+                    templateData.data.damage = {
+                        normal: actor._toNormalDamage ? actor._toNormalDamage(dmgRoll) : dmgRoll.total,
+                        straight: dmgRoll.total,
+                        damageType: dmgType || 'magic',
+                        isMagic: dmgIsMagic ?? true,
+                        targetActorId: actor.id,
+                        rollHtml: await dmgRoll.render(),
+                    };
+                    chatData.rolls.push(dmgRoll);
+                } catch (e) {
+                    console.warn('Godbound | не удалось бросить урон по формуле', formula, e);
+                }
             }
             chatData.content = await renderTemplate(template, templateData);
-            chatData.rolls = [roll];
             if (game.dice3d) {
                 await game.dice3d.showForRoll(roll, game.user, true, chatData.whisper, chatData.blind);
                 await ChatMessage.create(chatData);
@@ -753,7 +775,7 @@ async function executeGodboundItemMacro(...args) {
 }
 
 // Bump when a new one-time backfill needs to run for existing worlds.
-const BACKFILL_VERSION = 1;
+const BACKFILL_VERSION = 3;
 
 Hooks.once("ready", async () => {
     registerFullAccessSocket();
@@ -766,6 +788,8 @@ Hooks.once("ready", async () => {
             await backfillTokenBars();
             await backfillTokenSight();
             await backfillBloodWater();
+            await backfillMobTokenSizes();
+            await backfillFrayAndIcons();
             await game.settings.set("godbound", "backfillVersion", BACKFILL_VERSION);
         } catch (e) {
             console.error("Godbound | one-time backfill pass failed", e);
@@ -785,8 +809,64 @@ async function backfillBloodWater() {
     if (added > 0) ui.notifications?.info(`Godbound: добавлен дар «Кровь как вода» у ${added} толп(ы).`);
 }
 
-// When an NPC's cardinality changes: resize its token footprint (1×1 single/small,
-// 4×4 large, 9×9 vast) and, if it became a Mob, add "Кровь как вода" if missing.
+// One-time pass: every PC gets the fray die «Кость Схватки» if missing, and
+// items still pointing at the game-icons-net module (not installed → no icon)
+// are switched to core Foundry icons.
+async function backfillFrayAndIcons() {
+    let icons = 0, fray = 0;
+    for (const actor of game.actors) {
+        const updates = [];
+        for (const it of actor.items) {
+            const fixedImg = fixGameIconPath(it.img);
+            if (fixedImg) updates.push({_id: it.id, img: fixedImg});
+        }
+        if (updates.length) {
+            try { await actor.updateEmbeddedDocuments('Item', updates); icons += updates.length; }
+            catch (e) { console.warn('Godbound | icon backfill failed for', actor?.name, e); }
+        }
+        if (actor.type === 'pc' && !actor.items.some(i =>
+            i.type === 'autoHitAttack' && (i.system?.fray || i.name === 'Кость Схватки'))) {
+            try { await actor.createEmbeddedDocuments('Item', [frayAttackData()]); fray++; }
+            catch (e) { console.warn('Godbound | fray backfill failed for', actor?.name, e); }
+        }
+    }
+    if (icons > 0 || fray > 0) {
+        ui.notifications?.info(`Godbound: исправлено иконок предметов: ${icons}, добавлена «Кость Схватки»: ${fray} перс.`);
+    }
+}
+
+// One-time pass: bring every existing NPC (and their placed tokens) to the
+// cardinality footprint — Одиночка 1×1, малая толпа 2×2, большая 3×3, огромная 4×4.
+async function backfillMobTokenSizes() {
+    let fixed = 0;
+    for (const actor of game.actors) {
+        if (actor.type !== 'npc') continue;
+        const size = cardinalityTokenSize(actor.system?.cardinality);
+        if (actor.prototypeToken?.width !== size || actor.prototypeToken?.height !== size) {
+            try { await actor.update({prototypeToken: {width: size, height: size}}); fixed++; }
+            catch (e) { console.warn('Godbound | mob-size backfill failed for actor', actor?.name, e); }
+        }
+    }
+    for (const scene of game.scenes) {
+        const updates = [];
+        for (const token of scene.tokens) {
+            if (token.actor?.type !== 'npc') continue;
+            const size = cardinalityTokenSize(token.actor.system?.cardinality);
+            if (token.width !== size || token.height !== size) {
+                updates.push({_id: token.id, width: size, height: size});
+            }
+        }
+        if (updates.length) {
+            try { await scene.updateEmbeddedDocuments('Token', updates); fixed += updates.length; }
+            catch (e) { console.warn('Godbound | mob-size backfill failed for scene', scene?.name, e); }
+        }
+    }
+    if (fixed > 0) ui.notifications?.info(`Godbound: размеры токенов по численности исправлены у ${fixed} объект(ов).`);
+}
+
+// When an NPC's cardinality changes: resize its token footprint (Одиночка 1×1,
+// малая толпа 2×2, большая 3×3, огромная 4×4) and, if it became a Mob, add
+// "Кровь как вода" if missing.
 Hooks.on("updateActor", async (actor, changed) => {
     if (game.users?.activeGM !== game.user) return;
     if (actor.type !== 'npc') return;
@@ -897,3 +977,87 @@ async function backfillTokenBars() {
         ui.notifications?.info(`Godbound: обновлены полосы токенов (HP снизу, Броня сверху) у ${fixed} объект(ов). Переоткройте HUD токена.`);
     }
 }
+
+/* -------------------------------------------- */
+/*  GM-тултип при наведении на токен            */
+/* -------------------------------------------- */
+
+// The GM sees a compact stat card next to a token on plain hover, without
+// having to open the token HUD (right-click) or the sheet.
+function gbRemoveTokenTooltip() {
+    document.getElementById('gb-token-tooltip')?.remove();
+}
+
+function gbTokenTooltipHtml(actor) {
+    const e = s => String(s ?? '').replace(/[&<>"']/g,
+        c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+    const sys = actor.system;
+    const rows = [];
+    const row = (label, value) => rows.push(
+        `<div class="gb-tt-row"><span>${label}</span><b>${value}</b></div>`);
+    if (actor.type === 'pc') {
+        row('Уровень', e(sys.level));
+        row('ОЗ', `${e(sys.hp?.current)} / ${e(sys.computed?.hp?.max)}`);
+        row('КБ', e(sys.computed?.armor?.ac));
+        const sv = sys.computed?.saves;
+        if (sv) row('Спасброски', `Ст ${e(sv.hardiness?.save)}+ · Ук ${e(sv.evasion?.save)}+ · Дух ${e(sv.spirit?.save)}+`);
+        row('Усилие', `${e(sys.computed?.effort?.available ?? 0)} / ${e(sys.effort?.total ?? 0)}`);
+    } else if (actor.type === 'npc') {
+        row('КЗ', `${e(sys.hd?.current)} / ${e(sys.hd?.max)}`);
+        if (sys.computed?.isMob) {
+            row('Бойцов', `${e(sys.computed.mobRemaining)}${sys.computed.mobTotal ? ' / ' + e(sys.computed.mobTotal) : ''}`);
+        }
+        row('КБ', e(sys.ac));
+        row('Спасбросок', `${e(sys.save)}+`);
+        row('Мораль', e(sys.morale));
+        if (sys.move) row('Движение', e(sys.move));
+        row('Атаки', `${e(sys.numAttacks ?? 1)} (действий: ${e(sys.numActions ?? 1)})`);
+        if (Number(sys.effort?.total) > 0) {
+            row('Усилие', `${e(sys.computed?.effort?.available ?? 0)} / ${e(sys.effort.total)}`);
+        }
+    } else if (actor.type === 'faction') {
+        const f = sys.faction || {};
+        row('Мощь', e(f.power));
+        row('Кость действия', e(f.actionDie));
+        row('Сплочённость', `${e(f.cohesion?.current)} / ${e(f.cohesion?.max)}`);
+        row('Проблемы', `${e(f.trouble?.current ?? 0)} / ${e(f.trouble?.max ?? 6)}`);
+    }
+    return `<div class="gb-tt-name">${e(actor.name)}</div>${rows.join('')}`;
+}
+
+Hooks.on('hoverToken', (token, hovered) => {
+    if (!game.user?.isGM) return;
+    gbRemoveTokenTooltip();
+    if (!hovered || !token?.actor) return;
+    const div = document.createElement('div');
+    div.id = 'gb-token-tooltip';
+    div.className = 'godbound';
+    div.innerHTML = gbTokenTooltipHtml(token.actor);
+    document.body.appendChild(div);
+    // Ставим карточку справа от токена; если не влезает — слева/в пределах окна.
+    let pt;
+    try {
+        pt = canvas.clientCoordinatesFromCanvas({x: token.document.x + token.w, y: token.document.y});
+    } catch (err) {
+        const t = token.worldTransform;
+        pt = {x: t.tx + token.w * canvas.stage.scale.x, y: t.ty};
+    }
+    let left = pt.x + 10;
+    let top = pt.y;
+    const r = div.getBoundingClientRect();
+    if (left + r.width > window.innerWidth - 8) {
+        try {
+            const p2 = canvas.clientCoordinatesFromCanvas({x: token.document.x, y: token.document.y});
+            left = p2.x - r.width - 10;
+        } catch (err) {
+            left = window.innerWidth - r.width - 8;
+        }
+    }
+    top = Math.max(8, Math.min(top, window.innerHeight - r.height - 8));
+    div.style.left = `${left}px`;
+    div.style.top = `${top}px`;
+});
+
+Hooks.on('canvasPan', gbRemoveTokenTooltip);
+Hooks.on('deleteToken', gbRemoveTokenTooltip);
+Hooks.on('canvasTearDown', gbRemoveTokenTooltip);

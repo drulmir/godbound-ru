@@ -5,7 +5,7 @@
             <div class="container col">
                 <h2>Связанное Слово</h2>
                 <div class="container row sheet-header">
-                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" data-tooltip="{{item.name}}" height="100"
                          width="100"/>
                     <div class="header-fields tabular">
                         <div>
@@ -48,7 +48,7 @@
                         <div>
                             <label></label>
                             <div style="display:flex; align-items: center">
-                                <input type="checkbox" name="system.free" {{checked system.free}} style="margin-left:0" title="Не тратит Очки Даров"/>Бесплатно
+                                <input type="checkbox" name="system.free" {{checked system.free}} style="margin-left:0" data-tooltip="Не тратит Очки Даров"/>Бесплатно
                             </div>
                         </div>
                         <div>
@@ -61,7 +61,7 @@
                         <div>
                             <label></label>
                             <div style="display: flex; align-items: center">
-                                <label style="margin-right:4px;" title="Через запятую: fire, cold, lightning, acid, poison, disease, magic, holy, unholy, physical">Иммунитет:</label>
+                                <label style="margin-right:4px;" data-tooltip="Через запятую: fire, cold, lightning, acid, poison, disease, magic, holy, unholy, physical">Иммунитет:</label>
                                 <input type="text" name="system.passive.immune" value="{{system.passive.immune}}" placeholder="fire, cold, ..."/>
                             </div>
                         </div>
@@ -82,9 +82,9 @@
                         <div>
                             <label style="vertical-align: center">Действия:</label>
                             <div class="item-controls" style="padding-top:4px;">
-                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
-                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
-                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-chat" data-tooltip="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" data-tooltip="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" data-tooltip="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
                             </div>
                         </div>
                     </div>

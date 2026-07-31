@@ -3,12 +3,12 @@
 
     <div class="gb-actor">
         <div class="gb-portraits">
-            <img class="gb-portrait" src="{{data.actor.img}}" alt="" title="{{data.actor.name}}">
-            <img class="gb-portrait" src="{{data.itemImg}}" alt="" title="{{data.item.name}}">
+            <img class="gb-portrait" src="{{data.actor.img}}" alt="" data-tooltip="{{data.actor.name}}">
+            <img class="gb-portrait" src="{{data.itemImg}}" alt="" data-tooltip="{{data.item.name}}">
         </div>
         <div class="gb-names">
-            <span class="gb-name" title="{{data.item.name}}">{{data.item.name}}{{#if data.item.system.magic}}<span class="gb-magic" title="Магическое">✦</span>{{/if}}</span>
-            <span class="gb-sub" title="{{data.actor.name}}">{{data.actor.name}}</span>
+            <span class="gb-name" data-tooltip="{{data.item.name}}">{{data.item.name}}{{#if data.item.system.magic}}<span class="gb-magic" data-tooltip="Магическое">✦</span>{{/if}}</span>
+            <span class="gb-sub" data-tooltip="{{data.actor.name}}">{{data.actor.name}}</span>
         </div>
     </div>
 
@@ -16,10 +16,10 @@
     <div class="gb-actor gb-actor--target">
         <i class="fas fa-crosshairs gb-arrow"></i>
         <div class="gb-portraits">
-            <img class="gb-portrait gb-portrait--sm" src="{{data.targetToken.img}}" alt="" title="{{data.targetToken.name}}">
+            <img class="gb-portrait gb-portrait--sm" src="{{data.targetToken.img}}" alt="" data-tooltip="{{data.targetToken.name}}">
         </div>
         <div class="gb-names">
-            <span class="gb-name" title="{{data.targetToken.name}}">{{data.targetToken.name}}</span>
+            <span class="gb-name" data-tooltip="{{data.targetToken.name}}">{{data.targetToken.name}}</span>
         </div>
     </div>
     {{/if}}
@@ -30,8 +30,8 @@
         {{#if result.isCheckedForSuccess}}
             {{#if result.isFailure}}
             <div class="gb-verdict gb-verdict--bad">Промах</div>
-            {{#if result.guaranteedMinApplied}}
-            <div class="gb-note">Оружие всё равно наносит гарантированный минимальный урон.</div>
+            {{#if result.missMinDamage}}
+            <div class="gb-note">Оружие наносит минимум {{result.missMinDamage}} урона даже при промахе — кнопка ниже.</div>
             {{/if}}
             {{/if}}
             {{#if result.isSuccess}}
@@ -59,10 +59,13 @@
         <div class="gb-targets">
             {{#each data.targets as |t id|}}
             <div class="gb-target-row">
-                <span class="gb-target-row__name" title="{{t.name}}">{{t.name}}</span>
+                <span class="gb-target-row__name" data-tooltip="{{t.name}}">{{t.name}}</span>
                 <div class="gb-btns">
                     <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../damageResult.normalDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}">Обычный</button>
                     <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../damageResult.straightDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}">Прямой</button>
+                    {{#if ../result.missMinDamage}}
+                    <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../result.missMinDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}" data-tooltip="Гарантированный минимальный урон при промахе">Промах ({{../result.missMinDamage}})</button>
+                    {{/if}}
                 </div>
             </div>
             {{/each}}
@@ -75,6 +78,11 @@
             <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{data.targetActorId}}" data-target-token-uuid="{{data.targetTokenUuid}}" data-amount="{{damageResult.normalDamage}}" data-damage-type="{{data.damageType}}" data-is-magic="{{data.isMagic}}">Обычный урон</button>
             <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{data.targetActorId}}" data-target-token-uuid="{{data.targetTokenUuid}}" data-amount="{{damageResult.straightDamage}}" data-damage-type="{{data.damageType}}" data-is-magic="{{data.isMagic}}">Прямой урон</button>
         </div>
+        {{#if result.missMinDamage}}
+        <div class="gb-btns gb-btns--1">
+            <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{data.targetActorId}}" data-target-token-uuid="{{data.targetTokenUuid}}" data-amount="{{result.missMinDamage}}" data-damage-type="{{data.damageType}}" data-is-magic="{{data.isMagic}}" data-tooltip="Гарантированный минимальный урон при промахе (напр. «Рука-Коса»)">Урон при промахе ({{result.missMinDamage}})</button>
+        </div>
+        {{/if}}
         {{/if}}
 
         {{!-- Кнопка показывается ВСЕГДА. Раньше она пряталась при
@@ -83,7 +91,7 @@
               нужнее всего: цель наводят уже после броска. Обработчик и так
               берёт цель заново в момент клика. --}}
         <div class="gb-btns gb-btns--1">
-            <button type="button" class="gb-btn gb-btn--primary attack-again-btn" data-token-uuid="{{data.actorUuid}}" data-actor-id="{{data.actor.id}}" data-item-id="{{data.item.id}}" title="Повторить эту атаку по текущей выбранной цели"><i class="fas fa-rotate-right"></i> Атаковать снова</button>
+            <button type="button" class="gb-btn gb-btn--primary attack-again-btn" data-token-uuid="{{data.actorUuid}}" data-actor-id="{{data.actor.id}}" data-item-id="{{data.item.id}}" data-tooltip="Повторить эту атаку по текущей выбранной цели"><i class="fas fa-rotate-right"></i> Атаковать снова</button>
         </div>
     </div>
 </div>

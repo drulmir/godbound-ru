@@ -14,6 +14,29 @@ export const CARDINALITY_TOKEN_SIZE = {
 };
 export const cardinalityTokenSize = (c) => CARDINALITY_TOKEN_SIZE[c] || 1;
 
+// Стартовая авто-атака «Кость Схватки» (fray die 1к8) — должна быть у каждого
+// персонажа-ПС. Иконка из ядра Foundry, чтобы не зависеть от модулей.
+export const frayAttackData = () => ({
+    name: 'Кость Схватки', type: 'autoHitAttack',
+    img: 'icons/svg/sword.svg',
+    system: {damageRoll: '1d8', fray: true}
+});
+
+// Старые версии системы ссылались на иконки модуля game-icons-net, который
+// может быть не установлен — тогда предметы остаются без иконки. Замена на
+// иконки из ядра Foundry (существуют в любой установке).
+export const GAME_ICON_FIX = {
+    'sword-spin.svg': 'icons/svg/sword.svg',
+    'shield-reflect.svg': 'icons/svg/holy-shield.svg',
+    'halt.svg': 'icons/svg/daze.svg',
+    'hypersonic-bolt.svg': 'icons/svg/lightning.svg',
+    'explosion-rays.svg': 'icons/svg/explosion.svg',
+};
+export const fixGameIconPath = (img) => {
+    if (!(img || '').startsWith('modules/game-icons-net/')) return null;
+    return GAME_ICON_FIX[img.split('/').pop()] || 'icons/svg/item-bag.svg';
+};
+
 /**
  * Describe a targeted token for a chat card's "apply damage" buttons.
  *
@@ -89,21 +112,24 @@ export class GodboundActor extends Actor {
                 this.updateSource({prototypeToken: {width: size, height: size}});
             }
         }
+        // Every PC gets the fray die: new (empty) actors receive the whole starter
+        // kit below; imported actors that already carry items still get the fray
+        // attack appended when it is missing.
+        if (this.type === 'pc' && data.items && data.items.length) {
+            const incoming = foundry.utils.getProperty(data, 'items') || [];
+            const hasFray = incoming.some(i =>
+                i.type === 'autoHitAttack' && (i.system?.fray || i.name === 'Кость Схватки'));
+            if (!hasFray) {
+                this.updateSource({items: [...incoming, frayAttackData()]});
+            }
+        }
         if (this.type === 'pc' && !(data.items && data.items.length)) {
             this.updateSource({
                 items: [
-                    {
-                        name: 'Кость Схватки', type: 'autoHitAttack',
-                        img: 'modules/game-icons-net/blackbackground/sword-spin.svg',
-                        system: {
-                            numDice: 1,
-                            diceType: 8,
-                            fray: true
-                        }
-                    },
+                    frayAttackData(),
                     {
                         name: 'Успех на спасброске', type: 'divineMiracle',
-                        img: 'modules/game-icons-net/blackbackground/shield-reflect.svg',
+                        img: 'icons/svg/holy-shield.svg',
                         system: {
                             description: "Преуспеть в проваленном спасброске",
                             effortCost: 1,
@@ -112,7 +138,7 @@ export class GodboundActor extends Actor {
                     },
                     {
                         name: 'Развеять эффект', type: 'divineMiracle',
-                        img: 'modules/game-icons-net/blackbackground/halt.svg',
+                        img: 'icons/svg/daze.svg',
                         system: {
                             description: "Развеять подходящий эффект, мгновенно — если он направлен прямо на вас.",
                             effortCost: 1,
@@ -122,7 +148,7 @@ export class GodboundActor extends Actor {
                     },
                     {
                         name: 'Божественный Гнев', type: 'divineMiracle',
-                        img: 'modules/game-icons-net/blackbackground/hypersonic-bolt.svg',
+                        img: 'icons/svg/lightning.svg',
                         system: {
                             description: "Вы поражаете выбранного врага в пределах видимости энергиями Слова, нанося @RollDmg[leveld8] урона. Вы всегда невосприимчивы к гневу своих связанных Слов, как и другие сущности, владеющие подобными силами.",
                             effortCost: 1,
@@ -133,7 +159,7 @@ export class GodboundActor extends Actor {
                     },
                     {
                         name: 'Корона Ярости', type: 'divineMiracle',
-                        img: 'modules/game-icons-net/blackbackground/explosion-rays.svg',
+                        img: 'icons/svg/explosion.svg',
                         system: {
                             description: "Вы обрушиваете поток энергии своего Слова на группу врагов, задевая всех в радиусе 30 футов от точки в пределах вашей видимости. Каждая жертва получает @RollDmg[halfLeveld8] урона. Ярость может избирательно щадить союзников в области, но тогда жертвы получают подходящий спасбросок, чтобы противостоять эффекту. Вы всегда невосприимчивы к яростям своих связанных Слов, как и другие сущности, владеющие подобными силами.",
                             effortCost: 1,
@@ -878,13 +904,12 @@ export class GodboundActor extends Actor {
             normalDamage: this._toNormalDamage(damageRoll),
         };
         // Some weapons (e.g. death scythes) guarantee a minimum amount of damage even on
-        // a miss - the roll never fully whiffs. Only bump the numbers up on an actual miss;
-        // a hit already deals at least the rolled damage.
+        // a miss - the roll never fully whiffs. On a miss the target takes exactly that
+        // minimum (not the rolled damage), so the card gets a dedicated button for it
+        // instead of silently inflating the rolled numbers.
         const minDamage = item.system.guaranteedMinDamage || 0;
         if (minDamage > 0 && templateData.result.isFailure) {
-            templateData.damageResult.straightDamage = Math.max(templateData.damageResult.straightDamage, minDamage);
-            templateData.damageResult.normalDamage = Math.max(templateData.damageResult.normalDamage, minDamage);
-            templateData.result.guaranteedMinApplied = true;
+            templateData.result.missMinDamage = minDamage;
         }
         templateData.data.damageType = item.system.damageType || 'physical';
         templateData.data.isMagic = !!item.system.magic;

@@ -23,8 +23,8 @@
                     </div>
                 </div>
                 <div style="position:relative; flex: 0 0 100px;">
-                    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
-                    <a class="token-image-share" title="Показать всем игрокам по центру экрана" style="position:absolute; bottom:2px; right:2px; background:rgba(255,255,255,0.85); border-radius:50%; width:22px; height:22px; text-align:center; line-height:22px;"><i class="fas fa-eye" style="color:#000;"></i></a>
+                    <img class="profile-img" src="{{actor.img}}" data-edit="img" data-tooltip="{{actor.name}}" height="100" width="100"/>
+                    <a class="token-image-share" data-tooltip="Показать всем игрокам по центру экрана" style="position:absolute; bottom:2px; right:2px; background:rgba(255,255,255,0.85); border-radius:50%; width:22px; height:22px; text-align:center; line-height:22px;"><i class="fas fa-eye" style="color:#000;"></i></a>
                 </div>
             </div>
 
@@ -32,28 +32,28 @@
                 <h2 style="margin:0;">Действия фракции</h2>
                 <div style="font-size:12px;color:#555;margin:2px 0 6px;">Бросает Кость Действий, разрешает проверки/Противоборство и применяет изменения ресурсов; результат — в чат.</div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                    <input type="button" class="faction-action" data-faction-action="gather" value="Накопить Силы" title="Внутреннее: проверка Неприятностей; при успехе +½ Могущества Владычества." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="enact" value="Принять Изменение" title="Внутреннее: решить Проблему / создать Особенность / общее изменение." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="cohesion" value="Восстановить Сплочённость" title="Внутреннее: потратить Владычество (Невероятное изменение); при успехе +1 Сплочённости." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="help" value="Помочь Союзнику" title="Внешнее: передать Владычество союзнику (проверка Неприятностей)." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="attack" value="Атаковать Соперника" title="Внешнее: Противоборство против соперника." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="expand" value="Расширить Участие" title="Внешнее: Противоборство; при победе +1 Участие в цели." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="remove" value="Устранить Участие" title="Внешнее: Противоборство; снять 1 Участие соперника в себе." style="width:auto;flex:0 0 auto;"/>
-                    <input type="button" class="faction-action" data-faction-action="spend" value="Потратить Участие" title="Особое: потратить Участие, чтобы украсть Владычество или изменить бросок." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="gather" value="Накопить Силы" data-tooltip="Внутреннее: проверка Неприятностей; при успехе +½ Могущества Владычества." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="enact" value="Принять Изменение" data-tooltip="Внутреннее: решить Проблему / создать Особенность / общее изменение." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="cohesion" value="Восстановить Сплочённость" data-tooltip="Внутреннее: потратить Владычество (Невероятное изменение); при успехе +1 Сплочённости." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="help" value="Помочь Союзнику" data-tooltip="Внешнее: передать Владычество союзнику (проверка Неприятностей)." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="attack" value="Атаковать Соперника" data-tooltip="Внешнее: Противоборство против соперника." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="expand" value="Расширить Участие" data-tooltip="Внешнее: Противоборство; при победе +1 Участие в цели." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="remove" value="Устранить Участие" data-tooltip="Внешнее: Противоборство; снять 1 Участие соперника в себе." style="width:auto;flex:0 0 auto;"/>
+                    <input type="button" class="faction-action" data-faction-action="spend" value="Потратить Участие" data-tooltip="Особое: потратить Участие, чтобы украсть Владычество или изменить бросок." style="width:auto;flex:0 0 auto;"/>
                 </div>
             </div>
 
             <div class="container col" style="margin-top:12px;">
                 <h2 style="display:flex;justify-content:space-between;margin:0;">
                     <span>Свои действия</span>
-                    <i class="fas fa-plus faction-custom-add" title="Добавить своё действие фракции"></i>
+                    <i class="fas fa-plus faction-custom-add" data-tooltip="Добавить своё действие фракции"></i>
                 </h2>
                 {{#each system.faction.customActions as |ca i|}}
                 <div class="container row" style="align-items:center;gap:6px;margin-top:4px;">
                     <input type="text" class="faction-custom-input" data-index="{{i}}" data-field="name" value="{{ca.name}}" style="flex:0 0 30%;" />
                     <input type="text" class="faction-custom-input" data-index="{{i}}" data-field="note" value="{{ca.note}}" placeholder="эффект / заметка (в чат)" style="flex:1 1 auto;" />
-                    <a class="faction-custom-roll" data-index="{{i}}" title="Бросить Кость Действий и вывести в чат"><i class="fas fa-dice-d6"></i></a>
-                    <a class="faction-custom-delete" data-index="{{i}}" title="Удалить"><i class="fas fa-trash"></i></a>
+                    <a class="faction-custom-roll" data-index="{{i}}" data-tooltip="Бросить Кость Действий и вывести в чат"><i class="fas fa-dice-d6"></i></a>
+                    <a class="faction-custom-delete" data-index="{{i}}" data-tooltip="Удалить"><i class="fas fa-trash"></i></a>
                 </div>
                 {{/each}}
             </div>
@@ -131,7 +131,7 @@
             <div class="container col" style="margin-top:24px;">
                 <h2 style="display:flex;justify-content: space-between;">
                     <span>Проекты</span>
-                    <i class="fas fa-plus itemAdder" data-item-type="project"></i>
+                    <i class="fas fa-plus itemAdder" data-tooltip="Добавить" data-item-type="project"></i>
                 </h2>
                 <ol class="item-list">
                     {{#each actor.items as |item id|}}
@@ -145,8 +145,8 @@
                             </span>
                         </h4>
                         <div class="item-controls">
-                            <a class="item-control item-chat" title="Описание в чат"><i class="fas fa-comment"></i></a>
-                            <a class="item-control item-delete" title="Удалить"><i class="fas fa-trash"></i></a>
+                            <a class="item-control item-chat" data-tooltip="Описание в чат"><i class="fas fa-comment"></i></a>
+                            <a class="item-control item-delete" data-tooltip="Удалить"><i class="fas fa-trash"></i></a>
                         </div>
                     </li>
                     {{/ifeq}}

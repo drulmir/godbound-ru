@@ -5,7 +5,7 @@
             <div class="container col">
                 <h2>Дар</h2>
                 <div class="container row sheet-header">
-                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" data-tooltip="{{item.name}}" height="100"
                          width="100"/>
                     <div class="header-fields tabular">
                         <div>
@@ -30,7 +30,7 @@
                             <label></label>
                             <div style="display:flex; align-items: center">
                                 <input type="checkbox" name="system.greater" {{checked system.greater}} style="margin-left:0" />Больший
-                                <input type="checkbox" name="system.free" {{checked system.free}} style="margin-left:16px;" title="Не тратит Очки Даров"/>Бесплатно
+                                <input type="checkbox" name="system.free" {{checked system.free}} style="margin-left:16px;" data-tooltip="Не тратит Очки Даров"/>Бесплатно
                             </div>
                         </div>
                         <div>
@@ -68,7 +68,7 @@
                         <div>
                             <label></label>
                             <div style="display: flex; align-items: center">
-                                <label style="margin-right:4px;" title="Через запятую: fire, cold, lightning, acid, poison, disease, magic, holy, unholy, physical">Иммунитет:</label>
+                                <label style="margin-right:4px;" data-tooltip="Через запятую: fire, cold, lightning, acid, poison, disease, magic, holy, unholy, physical">Иммунитет:</label>
                                 <input type="text" name="system.passive.immune" value="{{system.passive.immune}}" placeholder="fire, cold, ..."/>
                             </div>
                         </div>
@@ -87,15 +87,15 @@
                             </div>
                         </div>
                         <div>
-                            <label for="guaranteedMinDamage" title="Урон, который проходит даже при промахе (напр. косы смерти) — перенесите то же число в лист связанной Атаки">Мин. урон при промахе:</label>
+                            <label for="guaranteedMinDamage" data-tooltip="Урон, который проходит даже при промахе (напр. косы смерти) — перенесите то же число в лист связанной Атаки">Мин. урон при промахе:</label>
                             <input id="guaranteedMinDamage" name="system.guaranteedMinDamage" type="text" value="{{system.guaranteedMinDamage}}" data-dtype="Number" class="compact"/>
                         </div>
                         <div>
-                            <label for="combatTag" title="Справочная метка механики боя, реализованной в системе (auto-hit / max-damage / area-attack) — включите соответствующие галочки на листе связанной Атаки, пока эффект активен">Тег механики:</label>
+                            <label for="combatTag" data-tooltip="Справочная метка механики боя, реализованной в системе (auto-hit / max-damage / area-attack) — включите соответствующие галочки на листе связанной Атаки, пока эффект активен">Тег механики:</label>
                             <input id="combatTag" name="system.combatTag" type="text" value="{{system.combatTag}}" placeholder="напр. auto-hit + max-damage"/>
                         </div>
                         <div>
-                            <label for="saveType" title="Если задано, при использовании дара в чате появится кнопка спасброска — нажавший игрок бросает спасбросок за своего персонажа">Спасбросок цели:</label>
+                            <label for="saveType" data-tooltip="Если задано, при использовании дара в чате появится кнопка спасброска — нажавший игрок бросает спасбросок за своего персонажа">Спасбросок цели:</label>
                             <select id="saveType" name="system.saveType">
                                 {{#select system.saveType}}
                                 <option value="none">Нет</option>
@@ -106,14 +106,14 @@
                             </select>
                         </div>
                         <div>
-                            <label title="Дары вроде «Руки-косы»: опишите здесь атаку, которую даёт дар, и кнопкой ниже (или с листа персонажа) добавьте её владельцу — атака не будет добавлена повторно, если она уже есть">Атака дара:</label>
+                            <label data-tooltip="Дары вроде «Руки-косы»: опишите здесь атаку, которую даёт дар, и кнопкой ниже (или с листа персонажа) добавьте её владельцу — атака не будет добавлена повторно, если она уже есть">Атака дара:</label>
                             <div style="display:flex; align-items: center">
                                 <input type="checkbox" name="system.attack.enabled" {{checked system.attack.enabled}} style="margin-left:0" />Дар даёт атаку
                             </div>
                         </div>
                         {{#if system.attack.enabled}}
                         <div>
-                            <label for="attackName" title="Пусто — атака получит имя дара">Имя атаки:</label>
+                            <label for="attackName" data-tooltip="Пусто — атака получит имя дара">Имя атаки:</label>
                             <input id="attackName" name="system.attack.name" type="text" value="{{system.attack.name}}" placeholder="{{item.name}}"/>
                         </div>
                         <div>
@@ -170,7 +170,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="attackGuaranteedMinDamage" title="Урон, который проходит даже при промахе (напр. косы смерти)">Мин. урон при промахе:</label>
+                            <label for="attackGuaranteedMinDamage" data-tooltip="Урон, который проходит даже при промахе (напр. косы смерти)">Мин. урон при промахе:</label>
                             <input id="attackGuaranteedMinDamage" name="system.attack.guaranteedMinDamage" type="text" value="{{system.attack.guaranteedMinDamage}}" data-dtype="Number" class="compact"/>
                         </div>
                         <div>
@@ -184,12 +184,12 @@
                         <div>
                             <label></label>
                             <div style="display:flex; align-items: center">
-                                <a class="item-control gift-attack-add" title="Добавить эту атаку владельцу дара (если такой атаки у него ещё нет)"><i class="fas fa-khanda"></i> Добавить атаку персонажу</a>
+                                <a class="item-control gift-attack-add" data-tooltip="Добавить эту атаку владельцу дара (если такой атаки у него ещё нет)"><i class="fas fa-khanda"></i> Добавить атаку персонажу</a>
                             </div>
                         </div>
                         {{/if}}
                         <div>
-                            <label title="Зона действия из описания (в футах) — на листе персонажа появится кнопка, спавнящая едва заметный шаблон зоны на карте; повторное нажатие убирает его">Зона (AoE):</label>
+                            <label data-tooltip="Зона действия из описания (в футах) — на листе персонажа появится кнопка, спавнящая едва заметный шаблон зоны на карте; повторное нажатие убирает его">Зона (AoE):</label>
                             <div style="display:flex; align-items:center">
                                 <input type="checkbox" name="system.aoe.enabled" {{checked system.aoe.enabled}} style="margin-left:0"/>Есть зона на карте
                             </div>
@@ -207,7 +207,7 @@
                                     {{/select}}
                                 </select>
                                 <input type="text" name="system.aoe.radius" value="{{system.aoe.radius}}" data-dtype="Number" class="compact" style="margin-left:8px;"/>
-                                <input type="checkbox" name="system.aoe.perLevel" {{checked system.aoe.perLevel}} style="margin-left:12px;" title="Умножать на уровень персонажа"/>на уровень
+                                <input type="checkbox" name="system.aoe.perLevel" {{checked system.aoe.perLevel}} style="margin-left:12px;" data-tooltip="Умножать на уровень персонажа"/>на уровень
                             </div>
                         </div>
                         {{#ifeq system.aoe.shape "ray"}}
@@ -220,9 +220,9 @@
                         <div>
                             <label style="vertical-align: center">Действия:</label>
                             <div class="item-controls" style="padding-top:4px;">
-                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
-                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
-                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-chat" data-tooltip="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" data-tooltip="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" data-tooltip="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
                             </div>
 
                         </div>

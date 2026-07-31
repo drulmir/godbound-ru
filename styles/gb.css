@@ -549,3 +549,38 @@
 .godbound.actor .gb-panel h3 {
   margin-top: 2px;
 }
+
+/* GM-тултип при наведении на токен */
+#gb-token-tooltip {
+  position: fixed;
+  z-index: 100;
+  min-width: 150px;
+  max-width: 280px;
+  padding: 6px 10px;
+  background: rgba(22, 19, 14, 0.93);
+  color: #eee;
+  border: 1px solid #a8842f;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+#gb-token-tooltip .gb-tt-name {
+  font-weight: bold;
+  color: #f0c75e;
+  font-size: 13px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(168, 132, 47, 0.4);
+  padding-bottom: 2px;
+}
+#gb-token-tooltip .gb-tt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  line-height: 1.5;
+}
+#gb-token-tooltip .gb-tt-row b {
+  color: #fff;
+  font-weight: 600;
+  text-align: right;
+}

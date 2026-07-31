@@ -3,11 +3,11 @@
 
     <div class="gb-actor">
         <div class="gb-portraits">
-            <img class="gb-portrait" src="{{data.actor.img}}" alt="" title="{{data.actor.name}}">
+            <img class="gb-portrait" src="{{data.actor.img}}" alt="" data-tooltip="{{data.actor.name}}">
         </div>
         <div class="gb-names">
-            <span class="gb-name" title="{{details}}">{{details}}</span>
-            <span class="gb-sub" title="{{data.actor.name}}">{{data.actor.name}}</span>
+            <span class="gb-name" data-tooltip="{{details}}">{{details}}</span>
+            <span class="gb-sub" data-tooltip="{{data.actor.name}}">{{data.actor.name}}</span>
         </div>
     </div>
 
@@ -28,6 +28,7 @@
 
         {{#if data.damage}}
         <div class="gb-actions">
+            {{#if data.damage.rollHtml}}{{{data.damage.rollHtml}}}{{/if}}
             <div class="gb-hint">Спасбросок провален — нанести урон:</div>
             <div class="gb-btns">
                 <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{data.damage.targetActorId}}" data-amount="{{data.damage.normal}}" data-damage-type="{{data.damage.damageType}}" data-is-magic="{{data.damage.isMagic}}">Обычный урон</button>

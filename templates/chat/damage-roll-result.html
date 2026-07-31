@@ -3,12 +3,12 @@
 
     <div class="gb-actor">
         <div class="gb-portraits">
-            <img class="gb-portrait" src="{{data.actor.img}}" alt="" title="{{data.actor.name}}">
-            <img class="gb-portrait" src="{{data.itemImg}}" alt="" title="{{data.item.name}}">
+            <img class="gb-portrait" src="{{data.actor.img}}" alt="" data-tooltip="{{data.actor.name}}">
+            <img class="gb-portrait" src="{{data.itemImg}}" alt="" data-tooltip="{{data.item.name}}">
         </div>
         <div class="gb-names">
-            <span class="gb-name" title="{{data.item.name}}">{{data.item.name}}</span>
-            <span class="gb-sub" title="{{data.actor.name}}">{{data.actor.name}}</span>
+            <span class="gb-name" data-tooltip="{{data.item.name}}">{{data.item.name}}</span>
+            <span class="gb-sub" data-tooltip="{{data.actor.name}}">{{data.actor.name}}</span>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
         <div class="gb-targets">
             {{#each data.targets as |t id|}}
             <div class="gb-target-row">
-                <span class="gb-target-row__name" title="{{t.name}}">{{t.name}}</span>
+                <span class="gb-target-row__name" data-tooltip="{{t.name}}">{{t.name}}</span>
                 <div class="gb-btns">
                     <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../result.normalDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}" data-save-type="{{../data.saveType}}">Обычный</button>
                     <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{t.id}}" data-target-token-uuid="{{t.uuid}}" data-amount="{{../result.straightDamage}}" data-damage-type="{{../data.damageType}}" data-is-magic="{{../data.isMagic}}" data-save-type="{{../data.saveType}}">Прямой</button>

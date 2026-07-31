@@ -5,7 +5,7 @@
             <div class="container col">
                 <h2>Проект</h2>
                 <div class="container row sheet-header">
-                    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="100"
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" data-tooltip="{{item.name}}" height="100"
                          width="100"/>
                     <div class="header-fields tabular">
                         <div>
@@ -85,9 +85,9 @@
                         <div>
                             <label style="vertical-align: center">Действия:</label>
                             <div class="item-controls" style="padding-top:4px;">
-                                <a class="item-control item-chat" title="Эффект в чат"><i class="fas fa-comment"></i></a>
-                                <a class="item-control item-maybe-delete" title="Возможно удалить"><i class="fas fa-trash"></i></a>
-                                <a class="item-control item-delete" title="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-chat" data-tooltip="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" data-tooltip="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" data-tooltip="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
                             </div>
                         </div>
                     </div>
