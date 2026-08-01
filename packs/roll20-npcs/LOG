@@ -1,5 +1,5 @@
-2026/08/01-14:06:56.347 bbe8 Recovering log #367
-2026/08/01-14:06:56.347 bbe8 Level-0 table #369: started
-2026/08/01-14:06:56.349 bbe8 Level-0 table #369: 15625 bytes OK
-2026/08/01-14:06:56.353 bbe8 Delete type=0 #367
-2026/08/01-14:06:56.353 bbe8 Delete type=3 #366
+2026/08/01-23:36:52.474 9ba0 Recovering log #378
+2026/08/01-23:36:52.474 9ba0 Level-0 table #380: started
+2026/08/01-23:36:52.476 9ba0 Level-0 table #380: 52224 bytes OK
+2026/08/01-23:36:52.479 9ba0 Delete type=0 #378
+2026/08/01-23:36:52.480 9ba0 Delete type=3 #377
