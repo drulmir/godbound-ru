@@ -11,7 +11,7 @@ import {GodboundItemSheet} from "./item-sheet.js";
 import {GodboundActorSheet} from "./actor-sheet.js";
 import {EffortCommitmentDialog} from "./effortCommitmentDialog.js";
 import {PlayerRollDialog} from "./playerRollDialog.js";
-import {Capitalize, Label, esc, itemChatImage} from "./misc.js";
+import {Capitalize, Label, esc, itemChatImage, buildDamageFormula} from "./misc.js";
 import {registerFullAccessSettings, registerFullAccessSocket} from "./fullAccess.js";
 import {importGodboundActorFromFile} from "./export-import.js";
 
@@ -400,10 +400,10 @@ Hooks.once("init", async function () {
                     isMagic: dmgIsMagic,
                     targetActorId: actor.id,
                 };
-            } else if (result.isFailure && dmgFormula) {
-                // No pre-rolled numbers on the card — roll the damage now.
-                const bonus = Number($btn.data('dmgBonus')) || 0;
-                const formula = bonus ? `${dmgFormula}${bonus > 0 ? '+' : ''}${bonus}` : String(dmgFormula);
+            } else if (result.isFailure && (dmgFormula || Number($btn.data('dmgBonus')))) {
+                // No pre-rolled numbers on the card — roll the damage now. Кубик
+                // необязателен: плоский урон приходит одним лишь бонусом.
+                const formula = buildDamageFormula(dmgFormula, $btn.data('dmgBonus'));
                 try {
                     const dmgRoll = new Roll(formula);
                     await dmgRoll.evaluate();

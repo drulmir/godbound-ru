@@ -1,4 +1,4 @@
-import {TypeNames, Label, esc, isPlainDescription, itemChatImage} from "./misc.js";
+import {TypeNames, Label, esc, isPlainDescription, itemChatImage, buildDamageFormula} from "./misc.js";
 import {EffortCommitmentDialog} from "./effortCommitmentDialog.js";
 
 const renderTemplate = foundry.applications.handlebars.renderTemplate;
@@ -481,6 +481,17 @@ export class GodboundActor extends Actor {
             usedAtLevel: furyUsedAt,
         };
 
+        this._prepareArtifacts(data);
+
+        // Group Art items by their category for the Arts tab. Each Art entry
+        // can have several Art Levels nested beneath it.
+        this._prepareArts(data);
+    }
+
+    // Group Artifacts with the Artifact Powers that belong to them. Shared by
+    // PC and NPC: imported NPCs carry artifacts too, and without this their
+    // Artifacts tab would have nothing to render.
+    _prepareArtifacts(data) {
         let artifactIdx = {};
         data.computed.artifacts = [];
         if(this.items && this.items.size > 0) {
@@ -511,10 +522,6 @@ export class GodboundActor extends Actor {
             });
         }
         data.computed.artifactIdx = artifactIdx;
-
-        // Group Art items by their category for the Arts tab. Each Art entry
-        // can have several Art Levels nested beneath it.
-        this._prepareArts(data);
     }
 
     // Group Art items by their category for the Arts (Theurgy) tab. Each Art
@@ -623,6 +630,8 @@ export class GodboundActor extends Actor {
 
         // Group Art items (theurgy / low magic) so NPCs get the same Arts tab as PCs.
         this._prepareArts(data);
+        // Same for Artifacts: imported NPCs own them just as PCs do.
+        this._prepareArtifacts(data);
     }
 
     _extractBonus(roll) {
@@ -652,6 +661,11 @@ export class GodboundActor extends Actor {
     _toNormalDamage(roll) {
         let bonus = this._extractBonus(roll);
         let results = this._sortedDiceResults(roll);
+        // Плоский урон без единого кубика (например «урон, равный уровню») уже задан
+        // в очках повреждений — таблицу перевода к нему применять не к чему. Раньше
+        // здесь получалось `undefined + бонус` = NaN, и NaN проваливался в последнюю
+        // ветку таблицы, из-за чего ЛЮБОЙ плоский урон превращался в ровно 4.
+        if (results.length === 0) return roll.total;
         results[0] = results[0] + bonus;
         let runningTotal = 0;
         for(let i = 0; i < results.length; i++) {
@@ -891,9 +905,11 @@ export class GodboundActor extends Actor {
 
         // Roll damage alongside the attack roll instead of deferring it to a
         // separate click.
+        // Кубик урона необязателен: атака может наносить плоский урон (пустое левое
+        // поле + число справа). buildDamageFormula собирает оба случая, '0' — на случай
+        // атаки вообще без урона, чтобы карточка не падала на пустой формуле.
         let damageBonus = attrBonus + (item.system.damageBonus || 0);
-        let damageFormula = damageBonus === 0 ? item.system.damageRoll :
-            `${item.system.damageRoll}${damageBonus > 0 ? '+' : ''}${damageBonus}`;
+        let damageFormula = buildDamageFormula(item.system.damageRoll, damageBonus) || '0';
         let damageRoll = new Roll(damageFormula);
         // "Max-damage" gifts (e.g. "Разрушитель Бункеров") treat the damage roll as if
         // every die came up maximum, instead of actually rolling it.
@@ -959,9 +975,12 @@ export class GodboundActor extends Actor {
             ui.notifications.info('У этого эффекта не задано воздействие (Атака/Спасбросок).');
             return;
         }
-        const dmg = item.system.damageRoll;
+        // Урон может быть как броском («1к8+2»), так и плоским числом без кубика
+        // (пустое поле кубика + число в бонусе) — Искусства сплошь и рядом наносят
+        // фиксированный урон, и такую запись тоже нужно принимать.
+        const formula = buildDamageFormula(item.system.damageRoll, item.system.damageBonus);
         if (type === 'attack') {
-            if (!dmg) { ui.notifications.warn('Для атаки задайте формулу урона.'); return; }
+            if (!formula) { ui.notifications.warn('Для атаки задайте урон: формулу броска или плоское число в поле бонуса.'); return; }
             await this.rollAttack(item);
             return;
         }
@@ -970,12 +989,7 @@ export class GodboundActor extends Actor {
         // that damage (success negates it).
         const saveType = (item.system.saveType && item.system.saveType !== 'none') ? item.system.saveType : null;
         if (!saveType) { ui.notifications.warn('Выберите тип спасброска для этого эффекта.'); return; }
-        let formula = null;
-        if (dmg) {
-            const bonus = item.system.damageBonus || 0;
-            formula = bonus ? `${dmg}${bonus > 0 ? '+' : ''}${bonus}` : dmg;
-        }
-        await this._postTheurgySave(item, saveType, formula);
+        await this._postTheurgySave(item, saveType, formula || null);
     }
 
     /**
@@ -1028,7 +1042,12 @@ export class GodboundActor extends Actor {
 
     async rollDamage(source, formula) {
         if(!formula) {
-            formula = source.system.computed.damageFormula;
+            formula = source.system?.computed?.damageFormula
+                || buildDamageFormula(source.system?.damageRoll, source.system?.damageBonus);
+        }
+        if(!formula) {
+            ui.notifications.warn(`У «${source?.name ?? '?'}» не задан урон: укажите формулу броска или плоское число в поле бонуса.`);
+            return;
         }
         let template = 'systems/godbound/templates/chat/damage-roll-result.html';
         let chatData = {

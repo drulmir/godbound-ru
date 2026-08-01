@@ -25,7 +25,7 @@
     {{#ifneq data.item.system.saveType "none"}}
     <div class="gb-actions">
         <div class="gb-btns gb-btns--1">
-            <button type="button" class="gb-btn gb-btn--primary gift-save-roll-btn" data-save="{{data.item.system.saveType}}" data-gift-name="{{data.item.name}}"{{#if data.item.system.damageRoll}} data-dmg-formula="{{data.item.system.damageRoll}}" data-dmg-bonus="{{data.item.system.damageBonus}}" data-damage-type="{{data.item.system.damageType}}"{{/if}}><i class="fas fa-shield-halved"></i> Спасбросок цели</button>
+            <button type="button" class="gb-btn gb-btn--primary gift-save-roll-btn" data-save="{{data.item.system.saveType}}" data-gift-name="{{data.item.name}}"{{#if data.item.system.computed.damageFormula}} data-dmg-formula="{{data.item.system.computed.damageFormula}}" data-damage-type="{{data.item.system.damageType}}"{{/if}}><i class="fas fa-shield-halved"></i> Спасбросок цели</button>
         </div>
     </div>
     {{/ifneq}}

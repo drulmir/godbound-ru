@@ -314,6 +314,7 @@
                             {{#each actor.items as |item id|}}
                             {{#ifeq item.type "divineMiracle"}}
                             <li class="item flexrow {{#if item.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{item.id}}">
+                                <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                                 <h4 class="item-name">
                                     {{item.name}}
                                     <span class="item-tags">
@@ -481,6 +482,7 @@
                         {{#each actor.items as |item id|}}
                         {{#ifeq item.type "fact"}}
                         <li class="item flexrow" data-item-id="{{item.id}}">
+                            <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                             <h4 class="item-name">{{item.name}}</h4>
                             <div class="item-controls">
                                 <a class="item-control item-expand" data-tooltip="Краткое описание"><i class="fas fa-caret-down"></i></a>
@@ -502,6 +504,7 @@
                         {{#each actor.items as |item id|}}
                         {{#ifeq item.type "language"}}
                         <li class="item flexrow" data-item-id="{{item.id}}">
+                            <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                             <h4 class="item-name">{{item.name}}</h4>
                             <div class="item-controls">
                                 <a class="item-control item-expand" data-tooltip="Краткое описание"><i class="fas fa-caret-down"></i></a>
@@ -638,12 +641,7 @@
                                     {{#ifneq item.system.hitBonus 0}}
                                         +{{item.system.hitBonus}}
                                     {{/ifneq}}
-                                    {{#ifneq item.system.damageBonus 0}}
-                                        {{item.system.damageRoll}}+{{item.system.damageBonus}}
-                                    {{/ifneq}}
-                                    {{#ifeq item.system.damageBonus 0}}
-                                        {{item.system.damageRoll}}
-                                    {{/ifeq}}
+                                    {{item.system.computed.damageFormula}}
                                     </span>
                                 </h4>
                                 <div class="item-controls">
@@ -672,17 +670,40 @@
                                 <h4 class="item-name">
                                     {{item.name}}
                                     <span class="item-tags">
-                                    {{#ifneq item.system.damageBonus 0}}
-                                        {{item.system.damageRoll}}+{{item.system.damageBonus}}
-                                    {{/ifneq}}
-
-                                    {{#ifeq item.system.damageBonus 0}}
-                                        {{item.system.damageRoll}}
-                                    {{/ifeq}}
+                                    {{item.system.computed.damageFormula}}
                                     </span>
                                 </h4>
                                 <div class="item-controls">
                                     <a class="autoattack-roll" data-tooltip="Бросок"><i class="fas fa-dice-d20"></i></a>
+                                </div>
+                            </li>
+                            {{/ifeq}}
+                            {{/each}}
+                        </ol>
+                    </div>
+
+                    {{!-- Multi-die damage rolls (Roll20's "multi die attacks"):
+                          damage only, no attack roll. --}}
+                    <div class="container col" style="margin-top:32px;">
+                        <h2 style="display:flex;justify-content: space-between;">
+                            <span>Мультикубик</span>
+                            <i class="fas fa-plus itemAdder" data-tooltip="Добавить" data-item-type="multiDieDamageRoll"></i>
+                        </h2>
+                        <ol class="item-list">
+                            {{#each actor.items as |item id|}}
+                            {{#ifeq item.type "multiDieDamageRoll"}}
+                            <li class="item flexrow" data-item-id="{{item.id}}">
+                                <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
+                                <h4 class="item-name">
+                                    {{item.name}}
+                                    <span class="item-tags">
+                                    {{item.system.computed.damageFormula}}
+                                    </span>
+                                </h4>
+                                <div class="item-controls">
+                                    <a class="autoattack-roll" data-tooltip="Бросок урона"><i class="fas fa-dice-d20"></i></a>
+                                    <a class="item-control item-edit" data-tooltip="Изменить"><i class="fas fa-edit"></i></a>
+                                    <a class="item-control item-delete" data-tooltip="Удалить"><i class="fas fa-trash"></i></a>
                                 </div>
                             </li>
                             {{/ifeq}}
@@ -725,6 +746,7 @@
                         {{#each actor.items as |item id|}}
                         {{#ifcombatpower ../actor.id item.id}}
                         <li class="item flexrow {{#if item.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{item.id}}">
+                            <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                             <h4 class="item-name">
                                 {{#if item.system.greater}}
                                 <span class="greater-gift"><i class="fas fa-certificate greater-gift-badge" data-tooltip="Больший дар"></i>{{item.name}}</span>
@@ -790,6 +812,7 @@
                     {{#each actor.items as |item id|}}
                     {{#ifeq item.type "treasure"}}
                     <li class="item flexrow" data-item-id="{{item.id}}">
+                        <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                         <h4 class="item-name">{{item.name}} (Ценность {{item.system.value}})</h4>
                         <div class="item-controls">
                             <a class="item-control item-chat" data-tooltip="Описание в чат"><i class="fas fa-comment"></i></a>
@@ -810,6 +833,7 @@
                 <ol class="item-list">
                     {{#each system.computed.artifacts as |artifact id|}}
                     <li class="item flexrow" data-item-id="{{artifact.item.id}}">
+                        <img class="item-image" src="{{artifact.item.img}}" data-tooltip="{{artifact.item.name}}" />
                         <h4 class="item-name">
                             {{artifact.item.name}} <span data-tooltip="Усилие артефакта: потрачено его дарами / свободно / всего">(Усилие: потрачено {{artifact.item.system.computed.effort.spent}} · свободно {{artifact.item.system.computed.effort.available}} из {{artifact.item.system.effort.total}})</span>
                             <span class="item-tags">
@@ -832,7 +856,8 @@
                         {{#each artifact.artifactPowers as |power id|}}
                         {{#ifeq power.type "artifactPower"}}
                         <li class="item flexrow {{#if power.system.atWill}}atwill-highlight{{/if}}" data-item-id="{{power.id}}">
-                            <h4 class="item-name" style="padding-left:16px;">
+                            <img class="item-image" src="{{power.img}}" data-tooltip="{{power.name}}" style="margin-left:16px;" />
+                            <h4 class="item-name">
                                 {{#if power.system.greater}}
                                 <span class="greater-gift"><i class="fas fa-certificate greater-gift-badge" data-tooltip="Больший дар"></i>{{power.name}}</span>
                                 {{/if}}
@@ -889,6 +914,7 @@
                     {{#each actor.items as |item id|}}
                     {{#ifeq item.type "project"}}
                     <li class="item flexrow" data-item-id="{{item.id}}">
+                        <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                         <h4 class="item-name">
                             {{item.name}}
                             <span class="item-tags">
@@ -930,6 +956,7 @@
                     {{#each actor.items as |item id|}}
                     {{#ifeq item.type "cult"}}
                     <li class="item flexrow" data-item-id="{{item.id}}">
+                        <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
                         <h4 class="item-name">
                             {{item.name}}
                             <span class="item-tags">

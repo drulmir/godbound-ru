@@ -1,3 +1,5 @@
+import {buildDamageFormula} from "./misc.js";
+
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -65,14 +67,15 @@ export class GodboundItem extends Item {
                 + (Number(data.effort.day) || 0);
         }
 
-        if (data.damageRoll) {
-            if (!data.damageBonus) {
-                data.computed.damageFormula = `${data.damageRoll}`;
-            } else if (data.damageBonus < 0) {
-                data.computed.damageFormula = `${data.damageRoll}${data.damageBonus}`;
-            } else {
-                data.computed.damageFormula = `${data.damageRoll}+${data.damageBonus}`;
-            }
+        // Формула урона. Левое поле (кубик) необязательно: плоский урон без броска
+        // задаётся пустым кубиком и числом в поле бонуса.
+        const damageFormula = buildDamageFormula(data.damageRoll, data.damageBonus);
+        if (damageFormula) data.computed.damageFormula = damageFormula;
+
+        // То же самое для атаки, встроенной в дар (system.attack.*).
+        if (data.attack) {
+            const attackFormula = buildDamageFormula(data.attack.damageRoll, data.attack.damageBonus);
+            if (attackFormula) data.computed.attackDamageFormula = attackFormula;
         }
     }
 

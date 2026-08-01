@@ -13,6 +13,8 @@ TODO.md
 
 # Ad-hoc backups (keep out of the shipped system tree)
 *-backup/
+*.backup/
+*.pre-*/
 *.bak
 _sheet-backup/
 

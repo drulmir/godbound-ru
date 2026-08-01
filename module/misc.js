@@ -52,6 +52,31 @@ export const Capitalize = (val) => {
     return val.slice(0, 1).toUpperCase() + val.slice(1);
 }
 
+/**
+ * Собрать формулу урона из пары полей «кубик» + «бонус».
+ *
+ * Куча даров и Искусств наносит ПЛОСКИЙ урон без броска («урон, равный уровню»,
+ * «3 очка повреждений»). На листе это записывается пустым левым полем и числом
+ * в правом. Раньше такая запись просто игнорировалась (формула не собиралась
+ * вовсе), поэтому кнопка урона либо молчала, либо падала на `new Roll(undefined)`.
+ *
+ * @returns {string} формула для Roll, либо '' если урона нет вообще.
+ */
+export const buildDamageFormula = (damageRoll, damageBonus) => {
+    const dice = String(damageRoll ?? '').trim();
+    const bonus = SafeNum(damageBonus);
+    if (dice && bonus) return `${dice}${bonus > 0 ? '+' : ''}${bonus}`;
+    if (dice) return dice;
+    if (bonus) return String(bonus);
+    return '';
+}
+
+/** Есть ли у предмета хоть какой-то урон (бросок или плоское число). */
+export const hasDamage = (system) => !!buildDamageFormula(system?.damageRoll, system?.damageBonus);
+
+/** В формуле нет ни одного кубика — это плоский, уже посчитанный урон. */
+export const isFlatFormula = (formula) => !/\dd\d|\bd\d/i.test(String(formula ?? ''));
+
 const names = {
     boundWord: 'Слово',
     divineGift: 'Дар',

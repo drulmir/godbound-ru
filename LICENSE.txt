@@ -22,6 +22,53 @@ SOFTWARE.
 
 ---
 
+Icons / Иконки — game-icons.net (CC BY 3.0)
+
+Every Word, Gift, Theurgy Art and Low Magic tradition in this system's compendia
+uses an icon from the game-icons.net collection (https://game-icons.net,
+https://github.com/game-icons/icons). The source SVGs were recoloured to a
+per-Word palette and rendered to webp; greater gifts additionally get a gold
+medallion frame. The results live in:
+
+  assets/icons/*.webp        — Words, lesser gifts, Arts
+  assets/gift-frames/*.webp  — greater gifts (`system.greater === true`)
+
+Icons made by, and used under Creative Commons 3.0 BY:
+
+  Lorc            http://lorcblog.blogspot.com
+  Delapouite      http://delapouite.com
+  Skoll
+  Caro Asercion
+  Sbed            http://opengameart.org/content/95-game-icons
+  DarkZaitzev     http://darkzaitzev.deviantart.com
+  Cathelineau
+  Willdabeast     http://wjbstories.blogspot.com
+  Faithtoken      http://fungustoken.deviantart.com
+  Carl Olsen      https://twitter.com/unstoppableCarl
+  Lord Berandas   http://berandas.deviantart.com
+  John Redman     http://www.uniquedicetowers.com
+  Lucas
+  Starseeker
+  HeavenlyDog     http://www.gnomosygoblins.blogspot.com
+  Quoting
+  Pepijn Poolman
+  Felbrigg        http://blackdogofdoom.blogspot.co.uk
+  SeregaCthtuf
+  Zeromancer      (CC0)
+
+CC BY 3.0 permits redistribution and modification, including commercially, as
+long as this attribution is preserved. Recolouring and framing the icons is a
+derivative work and is covered by that permission.
+
+Иконки взяты с game-icons.net и распространяются по лицензии Creative Commons
+3.0 BY. Исходные SVG перекрашены под палитру каждого Слова и отрисованы в webp;
+большие дары дополнительно получают золотую рамку. Лицензия разрешает
+изменение и распространение при сохранении указания авторов — список выше.
+
+Полный текст лицензии: https://creativecommons.org/licenses/by/3.0/
+
+---
+
 Third-party notice / Уведомление о стороннем коде
 
 This system is based on the original "Godbound" system module for Foundry VTT
