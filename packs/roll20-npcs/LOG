@@ -1,3 +1,5 @@
-2026/08/01-12:36:40.248 c280 Recovering log #354
-2026/08/01-12:36:40.257 c280 Delete type=0 #354
-2026/08/01-12:36:40.257 c280 Delete type=3 #352
+2026/08/01-14:06:56.347 bbe8 Recovering log #367
+2026/08/01-14:06:56.347 bbe8 Level-0 table #369: started
+2026/08/01-14:06:56.349 bbe8 Level-0 table #369: 15625 bytes OK
+2026/08/01-14:06:56.353 bbe8 Delete type=0 #367
+2026/08/01-14:06:56.353 bbe8 Delete type=3 #366
