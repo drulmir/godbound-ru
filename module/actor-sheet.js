@@ -181,6 +181,15 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.addGiftAttack(item);
     });
 
+    // Mark a Divine Gift as borrowed from another Godbound. Borrowing costs one
+    // Gift Point above the gift's own price; the sheet recomputes on update.
+    html.find('.gift-borrowed-toggle').click(ev => {
+      ev.preventDefault();
+      const li = $(ev.currentTarget).parents('.item');
+      const item = this.actor.items.get(li.data("itemId"));
+      if (item) item.update({ 'system.borrowed': !item.system.borrowed });
+    });
+
     // Spawn/remove the subtle AoE zone template of a power on the current scene.
     html.find('.aoe-zone-toggle').click(ev => {
       const li = $(ev.currentTarget).parents('.item');

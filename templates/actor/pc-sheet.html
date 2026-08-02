@@ -236,7 +236,7 @@
                         <tr>
                             <td>Очки Даров</td>
                             <td><input type="text" data-dtype="Number" name="system.giftPoints.total" value="{{system.giftPoints.total}}" data-tooltip="Всего доступных очков Даров" /></td>
-                            <td data-tooltip="3 за Слово, 2 за Большой Дар, 1 за Малый Дар">{{system.computed.giftPoints.spent}}</td>
+                            <td data-tooltip="3 за Слово, 2 за Большой Дар, 1 за Малый Дар; заимствованный Дар — на 1 дороже">{{system.computed.giftPoints.spent}}</td>
                             <td>{{system.computed.giftPoints.available}}</td>
                             <td></td>
                         </tr>
@@ -380,9 +380,13 @@
                                 {{#if item.system.smite}}
                                     <a data-tooltip="Кара"><i class="fas fa-meteor"></i></a>
                                 {{/if}}
+                                {{#if item.system.borrowed}}
+                                    <a data-tooltip="Заимствованный: +1 к цене в Очках Даров"><i class="fas fa-hand-holding borrowed-icon"></i></a>
+                                {{/if}}
                                 </span>
                             </h4>
                             <div class="item-controls">
+                                <a class="item-control gift-borrowed-toggle{{#if item.system.borrowed}} borrowed-on{{/if}}" data-tooltip="{{#if item.system.borrowed}}Заимствованный (+1 к цене). Нажмите, чтобы снять пометку.{{else}}Свой. Нажмите, чтобы пометить заимствованным (+1 к цене).{{/if}}"><i class="fas fa-hand-holding"></i></a>
                                 {{#if item.system.computed.effortHeld}}<a class="item-control item-effort-return" data-tooltip="Приложено Усилия: {{item.system.computed.effortHeld}} (По желанию {{item.system.effort.atWill}} · Сцена {{item.system.effort.scene}} · День {{item.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{item.system.computed.effortHeld}}</a>{{/if}}
                                 {{#if item.system.attack.enabled}}<a class="item-control gift-attack-add" data-tooltip="Добавить атаку из этого дара персонажу (если её ещё нет)"><i class="fas fa-khanda"></i></a>{{/if}}
                                 {{#if item.system.aoe.enabled}}<a class="item-control aoe-zone-toggle" data-tooltip="Зона на карте: клик — разместить курсором (ЛКМ — поставить, ПКМ — отмена), повторный клик — убрать"><i class="far fa-circle"></i></a>{{/if}}

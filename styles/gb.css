@@ -268,6 +268,21 @@
 .godbound .item-tags .atwill-icon {
   color: #d4a017;
 }
+/* Заимствованный Дар: приглушённая медь, чтобы не спорить с золотом Большого
+   Дара, но было видно, что за него платят на очко больше. */
+.godbound .item-tags .borrowed-icon {
+  color: #a1663a;
+}
+.godbound .item-controls .gift-borrowed-toggle {
+  opacity: 0.35;
+}
+.godbound .item-controls .gift-borrowed-toggle:hover {
+  opacity: 0.75;
+}
+.godbound .item-controls .gift-borrowed-toggle.borrowed-on {
+  opacity: 1;
+  color: #a1663a;
+}
 .godbound .item-list .item-controls {
   flex: 0 0 auto;
 }

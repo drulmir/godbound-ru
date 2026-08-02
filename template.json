@@ -248,6 +248,7 @@
       "word": "",
       "description": "",
       "free": false,
+      "borrowed": false,
       "constant": false,
       "instant": false,
       "onTurn": false,

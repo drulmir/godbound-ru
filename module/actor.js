@@ -447,7 +447,10 @@ export class GodboundActor extends Actor {
                 } else if(i.type === 'boundWord') {
                     if(!i.system.free) data.computed.giftPoints.spent += 3;
                 } else if(i.type === 'divineGift') {
-                    if(!i.system.free) data.computed.giftPoints.spent += i.system.greater ? 2 : 1;
+                    // Заимствованный Дар обходится на одно очко дороже обычного.
+                    // «Бесплатно» по-прежнему сильнее: такой Дар не стоит ничего.
+                    if(!i.system.free) data.computed.giftPoints.spent +=
+                        (i.system.greater ? 2 : 1) + (i.system.borrowed ? 1 : 0);
                 }
             });
         }
