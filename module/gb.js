@@ -634,6 +634,11 @@ Hooks.once("init", async function () {
         if (item.type === "art") {
             const pending = item.getFlag("godbound", "pendingLevels");
             if (!pending || !pending.length) return;
+            // На нелинкованных токенах хук может сработать повторно раньше, чем
+            // снятие флага доедет до дельты токена, — уровни плодились дважды.
+            // Если уровни этого искусства уже есть у владельца, только чистим флаг.
+            const already = item.parent.items.some(i => i.type === "artLevel" && i.system.artId === item.id);
+            if (already) { await item.unsetFlag("godbound", "pendingLevels"); return; }
             const levels = pending.map(l => ({
                 name: l.name || `Уровень ${l.level}`,
                 type: "artLevel",
@@ -647,6 +652,9 @@ Hooks.once("init", async function () {
         } else if (item.type === "artifact") {
             const pending = item.getFlag("godbound", "pendingPowers");
             if (!pending || !pending.length) return;
+            // Та же защита от повторного срабатывания, что и у уровней искусств.
+            const alreadyP = item.parent.items.some(i => i.type === "artifactPower" && i.system.artifactId === item.id);
+            if (alreadyP) { await item.unsetFlag("godbound", "pendingPowers"); return; }
             const powers = pending.map(p => ({
                 name: p.name,
                 type: "artifactPower",

@@ -1,3 +1,5 @@
-2026/08/04-00:08:15.594 afac Recovering log #730
-2026/08/04-00:08:15.599 afac Delete type=0 #730
-2026/08/04-00:08:15.599 afac Delete type=3 #729
+2026/08/04-01:30:57.267 751c Recovering log #732
+2026/08/04-01:30:57.267 751c Level-0 table #734: started
+2026/08/04-01:30:57.268 751c Level-0 table #734: 1773 bytes OK
+2026/08/04-01:30:57.271 751c Delete type=0 #732
+2026/08/04-01:30:57.271 751c Delete type=3 #731
