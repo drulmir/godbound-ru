@@ -125,6 +125,18 @@
         "",
         ""
       ],
+      "complications": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
       "faction": {
         "power": 1,
         "actionDie": "1d6",
@@ -247,6 +259,7 @@
     "divineGift": {
       "word": "",
       "description": "",
+      "giftCost": null,
       "free": false,
       "borrowed": false,
       "constant": false,
@@ -393,7 +406,9 @@
       "level": ""
     },
     "tactic": {
-      "description": ""
+      "description": "",
+      "kind": "tactics",
+      "entries": []
     },
     "cult": {
       "description": "",

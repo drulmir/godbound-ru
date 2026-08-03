@@ -17,6 +17,13 @@
                             <textarea id="description" name="system.description" class="tall">{{system.description}}</textarea>
                         </div>
                         <div>
+                            <label for="kind">Тип набора:</label>
+                            <select id="kind" name="system.kind">
+                                <option value="tactics" {{#ifeq system.kind "tactics"}}selected{{/ifeq}}>Тактика (к6)</option>
+                                <option value="complications" {{#ifeq system.kind "complications"}}selected{{/ifeq}}>Осложнения (к10)</option>
+                            </select>
+                        </div>
+                        <div>
                             <label style="vertical-align: center">Действия:</label>
                             <div class="item-controls" style="padding-top:4px;">
                                 <a class="item-control item-chat" data-tooltip="Эффект в чат"><i class="fas fa-comment"></i></a>
@@ -26,6 +33,15 @@
 
                         </div>
                     </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <h3>Набор (перетащите предмет на лист НПС — таблица заполнится):</h3>
+                    {{#each entrySlots as |e i|}}
+                    <div style="display:flex;align-items:flex-start;margin:2px 0;">
+                        <span style="width:26px;padding-top:4px;">{{add i 1}}.</span>
+                        <textarea name="system.entries.{{i}}" style="flex-grow:1;min-width:0;min-height:44px;font-size:13px;white-space:pre-wrap;overflow-wrap:break-word;resize:vertical;">{{e}}</textarea>
+                    </div>
+                    {{/each}}
                 </div>
             </div>
         </div>

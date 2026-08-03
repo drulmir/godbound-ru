@@ -49,6 +49,12 @@ export class GodboundItemSheet extends foundry.appv1.sheets.ItemSheet {
       }
       context.actorBoundWordNames = boundNames;
     }
+    if(this.item.type === 'tactic') {
+      // "Набор" editor: 6 slots for a tactics table (d6), 10 for complications (d10).
+      const isComplications = this.item.system.kind === 'complications';
+      const entries = this.item.system.entries || [];
+      context.entrySlots = Array.from({length: isComplications ? 10 : 6}, (_, i) => entries[i] || '');
+    }
     return context;
   }
   /** @override */

@@ -449,8 +449,15 @@ export class GodboundActor extends Actor {
                 } else if(i.type === 'divineGift') {
                     // Заимствованный Дар обходится на одно очко дороже обычного.
                     // «Бесплатно» по-прежнему сильнее: такой Дар не стоит ничего.
-                    if(!i.system.free) data.computed.giftPoints.spent +=
-                        (i.system.greater ? 2 : 1) + (i.system.borrowed ? 1 : 0);
+                    // system.giftCost — переопределение цены (техники малых Распрей
+                    // стоят 3, венчающая — 4); заимствование дорожает как обычно.
+                    if(!i.system.free) {
+                        // Переопределение действует только при цене > 0: пустое поле
+                        // приходит как 0/null и означает «обычная цена».
+                        const override = Number(i.system.giftCost);
+                        const base = override > 0 ? override : (i.system.greater ? 2 : 1);
+                        data.computed.giftPoints.spent += base + (i.system.borrowed ? 1 : 0);
+                    }
                 }
             });
         }
@@ -1218,28 +1225,52 @@ export class GodboundActor extends Actor {
      * works for both world actors and unlinked token actors.
      */
     async rollTactics() {
-        const tactics = this.system.tactics || [];
-        const roll = new Roll('1d6');
+        return this._rollGmTable({
+            title: 'Тактика',
+            die: '1d6',
+            dieIcon: 'fa-dice-d6',
+            entries: this.system.tactics || [],
+            reroll: () => this.rollTactics(),
+        });
+    }
+
+    /**
+     * Roll a d10 against this NPC's complications table (system.complications[0..9])
+     * — the "осложняющие способности" from the rulebook, shown on the Passives tab.
+     * Same GM-only dialog as tactics: the result is not posted to chat.
+     */
+    async rollComplications() {
+        return this._rollGmTable({
+            title: 'Осложнение',
+            die: '1d10',
+            dieIcon: 'fa-dice-d10',
+            entries: this.system.complications || [],
+            reroll: () => this.rollComplications(),
+        });
+    }
+
+    async _rollGmTable({title, die, dieIcon, entries, reroll}) {
+        const roll = new Roll(die);
         await roll.evaluate();
         const idx = roll.total - 1;
-        const text = (tactics[idx] && String(tactics[idx]).trim()) || '(не заполнено)';
+        const text = (entries[idx] && String(entries[idx]).trim()) || '(не заполнено)';
         new foundry.appv1.api.Dialog({
-            title: `Тактика — ${this.name}`,
+            title: `${title} — ${this.name}`,
             content:
                 `<div class="godbound chat-block gb-card gb-card--tactics">` +
-                `<h2 class="gb-title"><span class="gb-title__text">Тактика</span></h2>` +
+                `<h2 class="gb-title"><span class="gb-title__text">${esc(title)}</span></h2>` +
                 `<div class="gb-actor">` +
                 `<div class="gb-portraits"><img class="gb-portrait" src="${esc(this.img)}" alt=""></div>` +
                 `<div class="gb-names"><span class="gb-name" title="${esc(this.name)}">${esc(this.name)}</span>` +
-                `<span class="gb-sub">Бросок d6 — видно только вам</span></div></div>` +
+                `<span class="gb-sub">Бросок ${die.replace('1d', 'd')} — видно только вам</span></div></div>` +
                 `<div class="gb-stats gb-stats--1">` +
                 `<div class="gb-stat"><span class="gb-stat__label">Результат</span>` +
                 `<span class="gb-stat__value">${roll.total}</span></div></div>` +
                 `<div class="gb-desc">${esc(text)}</div></div>`,
             buttons: {
                 reroll: {
-                    icon: '<i class="fas fa-dice-d6"></i>', label: 'Перебросить',
-                    callback: () => this.rollTactics()
+                    icon: `<i class="fas ${dieIcon}"></i>`, label: 'Перебросить',
+                    callback: reroll
                 },
                 close: {icon: '<i class="fas fa-times"></i>', label: 'Закрыть'},
             },

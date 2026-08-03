@@ -128,6 +128,33 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   /* -------------------------------------------- */
 
+  /** @override */
+  async _onDropItemCreate(itemData, event) {
+    // Dropping a "набор" tactic item (kind + entries from the Осложнения/Тактики
+    // compendium) onto an NPC fills the matching table on the sheet instead of
+    // creating an embedded item: tactics → system.tactics (d6), complications →
+    // system.complications (d10, Passives tab).
+    const items = itemData instanceof Array ? itemData : [itemData];
+    const rest = [];
+    for (const it of items) {
+      const entries = it?.type === 'tactic' ? (it.system?.entries || []) : null;
+      if (this.actor.type === 'npc' && entries && entries.some(e => e && String(e).trim())) {
+        const isComplications = it.system.kind === 'complications';
+        const size = isComplications ? 10 : 6;
+        const table = Array.from({length: size}, (_, i) => String(entries[i] || '').trim());
+        await this.actor.update({[`system.${isComplications ? 'complications' : 'tactics'}`]: table});
+        ui.notifications.info(
+          isComplications
+            ? `«${it.name}»: осложнения (к10) заполнены во вкладке Пассивки.`
+            : `«${it.name}»: тактика (к6) заполнена во вкладке Бой.`
+        );
+      } else {
+        rest.push(it);
+      }
+    }
+    return rest.length ? super._onDropItemCreate(rest, event) : [];
+  }
+
   activateListeners(html) {
     super.activateListeners(html);
 
@@ -420,6 +447,11 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
     // with this.actor so it works on unlinked token sheets too.
     html.find('.roll-tactic-btn').click(async ev => {
       this.actor.rollTactics();
+    });
+
+    // Same for the complications table (d10) on the Passives tab.
+    html.find('.roll-complication-btn').click(async ev => {
+      this.actor.rollComplications();
     });
 
     html.find('.fray-roll').click(async ev => {
