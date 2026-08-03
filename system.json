@@ -2,7 +2,7 @@
   "id": "godbound",
   "title": "Godbound",
   "description": "Русскоязычная система для настольной ролевой игры Godbound в Foundry VTT: персонажи, НИП, толпы, Слова и Дары, теургия, артефакты и действия фракций.",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "socket": true,
   "license": "LICENSE.txt",
   "readme": "README.md",
@@ -55,6 +55,28 @@
       "label": "Персонажи (Roll20 Import)",
       "path": "packs/roll20-npcs",
       "type": "Actor",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "godwalker-parts",
+      "label": "Богоход: Опоры, Двигатели и Компоненты",
+      "path": "packs/godwalker-parts",
+      "type": "Item",
+      "system": "godbound",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "prosthetics",
+      "label": "Протезы (Аркем)",
+      "path": "packs/prosthetics",
+      "type": "Item",
       "system": "godbound",
       "ownership": {
         "PLAYER": "OBSERVER",

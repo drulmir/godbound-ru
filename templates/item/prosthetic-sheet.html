@@ -1,0 +1,40 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs active" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Протез</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" data-tooltip="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="bodyPart">Часть тела:</label>
+                            <input id="bodyPart" name="system.bodyPart" type="text" value="{{system.bodyPart}}"/>
+                        </div>
+                        <div>
+                            <label for="cost">Цена (очки протезирования):</label>
+                            <input id="cost" name="system.cost" type="text" data-dtype="Number" value="{{system.cost}}" class="compact"/>
+                        </div>
+                        <div>
+                            <label for="description">Описание:</label>
+                            <textarea id="description" name="system.description" class="tall">{{system.description}}</textarea>
+                        </div>
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" data-tooltip="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" data-tooltip="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" data-tooltip="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

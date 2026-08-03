@@ -19,5 +19,8 @@
   "TYPES.Item.art": "Искусство",
   "TYPES.Item.artLevel": "Уровень",
   "TYPES.Item.fact": "Факт",
-  "TYPES.Item.language": "Язык"
+  "TYPES.Item.language": "Язык",
+  "TYPES.Actor.godwalker": "Богоход",
+  "TYPES.Item.godwalkerPart": "Деталь Богохода",
+  "TYPES.Item.prosthetic": "Протез"
 }

@@ -7,6 +7,7 @@
         <a class="item" data-tab="arts">Искусства</a>
         <a class="item" data-tab="passives">Пассивки</a>
         <a class="item" data-tab="combat">Бой</a>
+        <a class="item" data-tab="prosthetics">Протезы</a>
         <a class="item" data-tab="wealth">Богатство</a>
         <a class="item" data-tab="artifacts">Артефакты</a>
         <a class="item" data-tab="projects">Проекты</a>
@@ -386,7 +387,6 @@
                                 </span>
                             </h4>
                             <div class="item-controls">
-                                <a class="item-control gift-borrowed-toggle{{#if item.system.borrowed}} borrowed-on{{/if}}" data-tooltip="{{#if item.system.borrowed}}Заимствованный (+1 к цене). Нажмите, чтобы снять пометку.{{else}}Свой. Нажмите, чтобы пометить заимствованным (+1 к цене).{{/if}}"><i class="fas fa-hand-holding"></i></a>
                                 {{#if item.system.computed.effortHeld}}<a class="item-control item-effort-return" data-tooltip="Приложено Усилия: {{item.system.computed.effortHeld}} (По желанию {{item.system.effort.atWill}} · Сцена {{item.system.effort.scene}} · День {{item.system.effort.day}}). Нажмите, чтобы вернуть." style="color:#b8860b;font-weight:bold;">&#9889;{{item.system.computed.effortHeld}}</a>{{/if}}
                                 {{#if item.system.attack.enabled}}<a class="item-control gift-attack-add" data-tooltip="Добавить атаку из этого дара персонажу (если её ещё нет)"><i class="fas fa-khanda"></i></a>{{/if}}
                                 {{#if item.system.aoe.enabled}}<a class="item-control aoe-zone-toggle" data-tooltip="Зона на карте: клик — разместить курсором (ЛКМ — поставить, ПКМ — отмена), повторный клик — убрать"><i class="far fa-circle"></i></a>{{/if}}
@@ -979,6 +979,58 @@
                         <input id="dominionOtherIncome" name="system.dominion.otherIncome" value="{{system.dominion.otherIncome}}" type="text" data-dtype="Number" class="compact" style="margin-left:8px" />
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="tab prosthetics" data-group="primary" data-tab="prosthetics">
+            <div class="container col">
+                <h2>Очки протезирования</h2>
+                <table style="text-align:center;max-width:360px;">
+                    <tr><th>Всего</th><th>Потрачено</th><th>Осталось</th></tr>
+                    <tr>
+                        <td><input type="text" data-dtype="Number" name="system.prostheticPoints.total" value="{{system.prostheticPoints.total}}" data-tooltip="Всего доступных очков протезирования — вписывается вручную" /></td>
+                        <td data-tooltip="Сумма цен установленных протезов">{{system.computed.prostheticPoints.spent}}</td>
+                        <td>{{system.computed.prostheticPoints.available}}</td>
+                    </tr>
+                </table>
+                <h3 style="margin-top:14px;">Куда установлено</h3>
+                <table style="text-align:center;max-width:420px;">
+                    <tr><th>Часть тела</th><th>Протезов</th><th>Очков</th></tr>
+                    {{#each system.computed.prostheticPoints.byPart as |p|}}
+                    <tr><td>{{p.part}}</td><td>{{p.count}}</td><td>{{p.cost}}</td></tr>
+                    {{/each}}
+                    {{#unless system.computed.prostheticPoints.byPart.length}}
+                    <tr><td colspan="3">&mdash;</td></tr>
+                    {{/unless}}
+                </table>
+                <h2 style="display:flex;justify-content:space-between;margin-top:16px;">
+                    <span>Протезы</span>
+                    <i class="fas fa-plus itemAdder" data-tooltip="Добавить" data-item-type="prosthetic"></i>
+                </h2>
+                <ol class="item-list">
+                    {{#each actor.items as |item id|}}
+                    {{#ifeq item.type "prosthetic"}}
+                    <li class="item flexrow" data-item-id="{{item.id}}">
+                        <img class="item-image" src="{{item.img}}" data-tooltip="{{item.name}}" />
+                        <h4 class="item-name">
+                            {{item.name}}
+                            <span class="item-tags">
+                                {{#if item.system.bodyPart}}<a data-tooltip="Часть тела">{{item.system.bodyPart}}</a>{{/if}}
+                                <a data-tooltip="Цена в очках протезирования">{{item.system.cost}} оч.</a>
+                            </span>
+                        </h4>
+                        <div class="item-controls">
+                            <a class="item-control item-expand" data-tooltip="Краткое описание"><i class="fas fa-caret-down"></i></a>
+                            <a class="item-control item-chat" data-tooltip="Отправить в чат"><i class="fas fa-comment"></i></a>
+                            <a class="item-control item-edit" data-tooltip="Изменить"><i class="fas fa-edit"></i></a>
+                            <a class="item-control item-delete" data-tooltip="Удалить"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    <li class="item-summary" style="display:none; padding:4px 10px; margin:0 0 6px; font-size:12px; border-left:3px solid #888; background:rgba(0,0,0,0.05); white-space:pre-wrap;">{{item.system.description}}</li>
+                    {{/ifeq}}
+                    {{/each}}
+                </ol>
+                <p style="font-size:12px;">Перетащите протез из компендиума «Протезы (Аркем)» — цена сама попадёт в «Потрачено».</p>
             </div>
         </div>
     </section>

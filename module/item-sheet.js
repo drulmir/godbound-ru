@@ -18,6 +18,15 @@ export class GodboundItemSheet extends foundry.appv1.sheets.ItemSheet {
     );
   }
 
+  constructor(item, options) {
+    super(item, options);
+    // Лист Дара шире прочих: строка «Больший/Бесплатно/Заимствованный + Цена»
+    // на стандартных 624px перекрывается.
+    if (this.item?.type === 'divineGift' && this.options.width === 624) {
+      this.options.width = 720;
+    }
+  }
+
   get template() {
     const path = "systems/godbound/templates/item";
     return `${path}/${this.item.type}-sheet.html`;

@@ -91,6 +91,8 @@ const names = {
     invocation: 'Воззвание',
     cult: 'Культ',
     tactic: 'Тактика',
+    godwalkerPart: 'Деталь Богохода',
+    prosthetic: 'Протез',
     artifactPower: 'Дар артефакта',
     art: 'Искусство',
     artLevel: 'Уровень',

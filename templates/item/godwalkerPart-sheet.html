@@ -1,0 +1,90 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attrs active" data-group="primary" data-tab="attrs">
+            <div class="container col">
+                <h2>Деталь Богохода</h2>
+                <div class="container row sheet-header">
+                    <img class="profile-img" src="{{item.img}}" data-edit="img" data-tooltip="{{item.name}}" height="100"
+                         width="100"/>
+                    <div class="header-fields tabular">
+                        <div>
+                            <label for="name">Имя:</label>
+                            <input id="name" name="name" type="text" value="{{item.name}}"/>
+                        </div>
+                        <div>
+                            <label for="kind">Вид:</label>
+                            <select id="kind" name="system.kind">
+                                <option value="chassis" {{#ifeq system.kind "chassis"}}selected{{/ifeq}}>Сакральная опора</option>
+                                <option value="engine" {{#ifeq system.kind "engine"}}selected{{/ifeq}}>Чакра-двигатель</option>
+                                <option value="component" {{#ifeq system.kind "component"}}selected{{/ifeq}}>Компонент</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="cost">Цена (очки Богохода):</label>
+                            <input id="cost" name="system.cost" type="text" data-dtype="Number" value="{{system.cost}}" class="compact"/>
+                            <label for="size" style="margin-left:12px;">Размер:</label>
+                            <select id="size" name="system.size" class="compact">
+                                <option value="S" {{#ifeq system.size "S"}}selected{{/ifeq}}>S</option>
+                                <option value="M" {{#ifeq system.size "M"}}selected{{/ifeq}}>M</option>
+                                <option value="L" {{#ifeq system.size "L"}}selected{{/ifeq}}>L</option>
+                            </select>
+                        </div>
+                        {{#ifeq system.kind "component"}}
+                        <div>
+                            <label for="slot">Чакра-слот:</label>
+                            <select id="slot" name="system.slot" class="compact">
+                                <option value="fire" {{#ifeq system.slot "fire"}}selected{{/ifeq}}>Огонь</option>
+                                <option value="metal" {{#ifeq system.slot "metal"}}selected{{/ifeq}}>Металл</option>
+                                <option value="void" {{#ifeq system.slot "void"}}selected{{/ifeq}}>Пустота</option>
+                                <option value="water" {{#ifeq system.slot "water"}}selected{{/ifeq}}>Вода</option>
+                                <option value="wind" {{#ifeq system.slot "wind"}}selected{{/ifeq}}>Ветер</option>
+                            </select>
+                            <label for="slotCount" style="margin-left:12px;" data-tooltip="Сколько слотов занимает компонент">Слотов:</label>
+                            <input id="slotCount" name="system.slotCount" type="text" data-dtype="Number" value="{{system.slotCount}}" class="compact" style="width:40px;"/>
+                            <label for="activation" style="margin-left:12px;">Активация:</label>
+                            <input id="activation" name="system.activation" type="text" value="{{system.activation}}" class="compact" style="width:110px;"/>
+                        </div>
+                        {{/ifeq}}
+                        {{#ifeq system.kind "chassis"}}
+                        <div>
+                            <label>КЗ:</label><input name="system.stats.hd" type="text" data-dtype="Number" value="{{system.stats.hd}}" class="compact" style="width:40px;"/>
+                            <label style="margin-left:8px;">КБ:</label><input name="system.stats.ac" type="text" data-dtype="Number" value="{{system.stats.ac}}" class="compact" style="width:40px;"/>
+                            <label style="margin-left:8px;">Атака:</label><input name="system.stats.attack" type="text" data-dtype="Number" value="{{system.stats.attack}}" class="compact" style="width:40px;"/>
+                            <label style="margin-left:8px;">Спас:</label><input name="system.stats.save" type="text" data-dtype="Number" value="{{system.stats.save}}" class="compact" style="width:40px;"/>
+                        </div>
+                        <div>
+                            <label>Движение:</label><input name="system.stats.move" type="text" value="{{system.stats.move}}" class="compact" style="width:120px;"/>
+                        </div>
+                        {{/ifeq}}
+                        {{#ifeq system.kind "engine"}}
+                        <div>
+                            <label>Усилие:</label><input name="system.stats.effort" type="text" data-dtype="Number" value="{{system.stats.effort}}" class="compact" style="width:40px;"/>
+                            <label style="margin-left:8px;">Действия:</label><input name="system.stats.actions" type="text" data-dtype="Number" value="{{system.stats.actions}}" class="compact" style="width:40px;"/>
+                        </div>
+                        <div data-tooltip="Слоты, которые даёт двигатель">
+                            <label>Огонь:</label><input name="system.slots.fire" type="text" data-dtype="Number" value="{{system.slots.fire}}" class="compact" style="width:36px;"/>
+                            <label style="margin-left:6px;">Металл:</label><input name="system.slots.metal" type="text" data-dtype="Number" value="{{system.slots.metal}}" class="compact" style="width:36px;"/>
+                            <label style="margin-left:6px;">Пустота:</label><input name="system.slots.void" type="text" data-dtype="Number" value="{{system.slots.void}}" class="compact" style="width:36px;"/>
+                            <label style="margin-left:6px;">Вода:</label><input name="system.slots.water" type="text" data-dtype="Number" value="{{system.slots.water}}" class="compact" style="width:36px;"/>
+                            <label style="margin-left:6px;">Ветер:</label><input name="system.slots.wind" type="text" data-dtype="Number" value="{{system.slots.wind}}" class="compact" style="width:36px;"/>
+                        </div>
+                        {{/ifeq}}
+                        <div>
+                            <label style="vertical-align: center">Действия:</label>
+                            <div class="item-controls" style="padding-top:4px;">
+                                <a class="item-control item-chat" data-tooltip="Эффект в чат"><i class="fas fa-comment"></i></a>
+                                <a class="item-control item-maybe-delete" data-tooltip="Возможно удалить"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-delete" data-tooltip="Удалить" style="color:red;margin-left:16px;display:none;"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <label for="description">Описание:</label>
+                    <textarea id="description" name="system.description" class="tall" style="min-height:180px;">{{system.description}}</textarea>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

@@ -152,6 +152,32 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
         rest.push(it);
       }
     }
+    // Опора или чакра-двигатель, брошенные на лист Богохода, заодно заполняют его
+    // характеристики: опора — КЗ/КБ/атаку/движение/спасбросок, двигатель — Усилие
+    // и действия. Сам предмет тоже создаётся (учёт очков и слотов).
+    if (this.actor.type === 'godwalker') {
+      for (const it of rest) {
+        if (it?.type !== 'godwalkerPart') continue;
+        const st = it.system?.stats || {};
+        if (it.system?.kind === 'chassis') {
+          await this.actor.update({
+            'system.hd.max': st.hd || 0,
+            'system.hd.current': st.hd || 0,
+            'system.ac': st.ac ?? 9,
+            'system.toHitBonus': st.attack || 0,
+            'system.move': st.move || '',
+            'system.save': st.save || 7,
+          });
+          ui.notifications.info(`Опора «${it.name}»: характеристики Богохода заполнены.`);
+        } else if (it.system?.kind === 'engine') {
+          await this.actor.update({
+            'system.effort.total': st.effort || 0,
+            'system.numActions': st.actions || 1,
+          });
+          ui.notifications.info(`Двигатель «${it.name}»: Усилие и действия Богохода заполнены.`);
+        }
+      }
+    }
     return rest.length ? super._onDropItemCreate(rest, event) : [];
   }
 
@@ -206,15 +232,6 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
       const li = $(ev.currentTarget).parents('.item');
       const item = this.actor.items.get(li.data("itemId"));
       this.actor.addGiftAttack(item);
-    });
-
-    // Mark a Divine Gift as borrowed from another Godbound. Borrowing costs one
-    // Gift Point above the gift's own price; the sheet recomputes on update.
-    html.find('.gift-borrowed-toggle').click(ev => {
-      ev.preventDefault();
-      const li = $(ev.currentTarget).parents('.item');
-      const item = this.actor.items.get(li.data("itemId"));
-      if (item) item.update({ 'system.borrowed': !item.system.borrowed });
     });
 
     // Spawn/remove the subtle AoE zone template of a power on the current scene.

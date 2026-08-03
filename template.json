@@ -3,7 +3,8 @@
     "types": [
       "pc",
       "npc",
-      "faction"
+      "faction",
+      "godwalker"
     ],
     "pc": {
       "description": "",
@@ -78,6 +79,9 @@
         "total": 0,
         "contributed": 0
       },
+      "prostheticPoints": {
+        "total": 0
+      },
       "wealth": {
         "total": 0,
         "description": ""
@@ -115,6 +119,9 @@
         "healing": 0
       },
       "notes": "",
+      "prostheticPoints": {
+        "total": 0
+      },
       "cardinality": "Individual",
       "combatNotes": "",
       "tactics": [
@@ -184,6 +191,30 @@
         "notes": "",
         "customActions": []
       }
+    },
+    "godwalker": {
+      "description": "",
+      "pilot": "",
+      "hd": {
+        "current": 0,
+        "max": 0
+      },
+      "ac": 9,
+      "toHitBonus": 0,
+      "numActions": 1,
+      "save": 7,
+      "move": "",
+      "effort": {
+        "total": 0,
+        "atWill": 0,
+        "scene": 0,
+        "day": 0
+      },
+      "points": {
+        "total": 0
+      },
+      "combatNotes": "",
+      "notes": ""
     }
   },
   "Item": {
@@ -201,6 +232,8 @@
       "treasure",
       "invocation",
       "tactic",
+      "godwalkerPart",
+      "prosthetic",
       "cult",
       "art",
       "artLevel",
@@ -409,6 +442,36 @@
       "description": "",
       "kind": "tactics",
       "entries": []
+    },
+    "godwalkerPart": {
+      "description": "",
+      "kind": "component",
+      "cost": 0,
+      "size": "S",
+      "slot": "",
+      "slotCount": 1,
+      "slots": {
+        "fire": 0,
+        "metal": 0,
+        "void": 0,
+        "water": 0,
+        "wind": 0
+      },
+      "activation": "",
+      "stats": {
+        "hd": 0,
+        "ac": 0,
+        "attack": 0,
+        "move": "",
+        "save": 0,
+        "effort": 0,
+        "actions": 0
+      }
+    },
+    "prosthetic": {
+      "description": "",
+      "bodyPart": "",
+      "cost": 0
     },
     "cult": {
       "description": "",

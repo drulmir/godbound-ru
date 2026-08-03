@@ -74,7 +74,7 @@ Hooks.once("init", async function () {
     // Register sheet application classes. Core no longer registers default
     // sheets in v13+, so we simply register ours as the default.
     foundry.documents.collections.Actors.registerSheet("godbound", GodboundActorSheet, {
-        types: ["pc", "npc", "faction"],
+        types: ["pc", "npc", "faction", "godwalker"],
         makeDefault: true
     });
     foundry.documents.collections.Items.registerSheet("godbound", GodboundItemSheet, {
@@ -187,6 +187,11 @@ Hooks.once("init", async function () {
 
     Handlebars.registerHelper('add', function(a1, a2) {
         return a1 + a2;
+    });
+
+    // Русские имена типов чакра-слотов Богохода.
+    Handlebars.registerHelper('slotName', function(key) {
+        return {fire: 'Огонь', metal: 'Металл', void: 'Пустота', water: 'Вода', wind: 'Ветер'}[key] || key;
     });
 
     Handlebars.registerHelper('json', function(context) {

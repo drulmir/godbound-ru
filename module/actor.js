@@ -246,11 +246,98 @@ export class GodboundActor extends Actor {
         // things organized.
         if (this.type === 'pc') this._preparePcData();
 
+        if (this.type === 'godwalker') this._prepareGodwalkerData();
+
         if (this.type === 'npc') this._prepareNpcData();
 
         if (this.type === 'faction') this._prepareFactionData();
 
-        if (this.type === 'pc' || this.type === 'npc') this._preparePassives();
+        if (this.type === 'pc' || this.type === 'npc') {
+            this._preparePassives();
+            this._prepareProstheticPoints();
+        }
+    }
+
+    // Очки протезирования (вкладка «Протезы» у ИП и НИП): «Всего» вводится вручную,
+    // потрачено — сумма цен встроенных предметов-протезов.
+    _prepareProstheticPoints() {
+        const data = this.system;
+        data.computed = data.computed || {};
+        let spent = 0;
+        // Разбивка по частям тела: куда установлено, сколько предметов и очков.
+        const byPart = {};
+        if (this.items) {
+            this.items.forEach(i => {
+                if (i.type !== 'prosthetic') return;
+                const cost = Number(i.system.cost) || 0;
+                spent += cost;
+                const part = (i.system.bodyPart || '').trim() || 'Не указано';
+                byPart[part] = byPart[part] || {part, count: 0, cost: 0};
+                byPart[part].count += 1;
+                byPart[part].cost += cost;
+            });
+        }
+        data.computed.prostheticPoints = {
+            spent,
+            available: (Number(data.prostheticPoints?.total) || 0) - spent,
+            byPart: Object.values(byPart).sort((a, b) => a.part.localeCompare(b.part, 'ru')),
+        };
+    }
+
+    // Богоход: очки богохода (total вручную, spent — сумма цен деталей) и учёт
+    // чакра-слотов: ёмкость из установленного двигателя, занятость — по компонентам.
+    // Слоты Пустоты универсальны: перебор родного типа уходит в свободную Пустоту.
+    _prepareGodwalkerData() {
+        const data = this.system;
+        data.computed = {};
+        let spent = 0;
+        const cap = {fire: 0, metal: 0, void: 0, water: 0, wind: 0};
+        const used = {fire: 0, metal: 0, void: 0, water: 0, wind: 0};
+        let chassis = null, engine = null;
+        if (this.items) {
+            this.items.forEach(i => {
+                if (i.type !== 'godwalkerPart') return;
+                spent += Number(i.system.cost) || 0;
+                if (i.system.kind === 'chassis') chassis = i;
+                else if (i.system.kind === 'engine') {
+                    engine = i;
+                    for (const k of Object.keys(cap)) cap[k] += Number(i.system.slots?.[k]) || 0;
+                } else {
+                    const s = i.system.slot;
+                    const n = Number(i.system.slotCount) || 1;
+                    if (used[s] !== undefined) used[s] += n;
+                    else used.void += n;
+                }
+            });
+        }
+        // перелив в Пустоту: избыток по типу считается занявшим слоты Пустоты
+        let voidUsed = used.void;
+        for (const k of ['fire', 'metal', 'water', 'wind']) {
+            if (used[k] > cap[k]) voidUsed += used[k] - cap[k];
+        }
+        data.computed.points = {
+            spent,
+            available: (Number(data.points?.total) || 0) - spent,
+        };
+        // Занятость по типу показываем честно: перебор относительно ёмкости
+        // двигателя подсвечивается красным (over), даже если Пустота его вмещает;
+        // красная Пустота означает, что компоненты уже некуда ставить.
+        const slotInfo = (k) => ({used: used[k], cap: cap[k], over: used[k] > cap[k]});
+        data.computed.slots = {
+            fire: slotInfo('fire'),
+            metal: slotInfo('metal'),
+            water: slotInfo('water'),
+            wind: slotInfo('wind'),
+            void: {used: voidUsed, cap: cap.void, over: voidUsed > cap.void},
+            overflow: voidUsed > cap.void,
+        };
+        data.computed.chassisName = chassis ? chassis.name : '';
+        data.computed.engineName = engine ? engine.name : '';
+        // Спасбросок как у НИП: одно число, кнопка на листе идёт через computed.saves.npc.
+        data.computed.saves = {npc: {save: data.save}};
+        const e = data.effort || {};
+        data.computed.effortAvailable = (Number(e.total) || 0)
+            - (Number(e.atWill) || 0) - (Number(e.scene) || 0) - (Number(e.day) || 0);
     }
 
     // Standalone Faction actor (own type/token). Mirrors the faction bookkeeping the
