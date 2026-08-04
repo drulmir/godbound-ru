@@ -366,8 +366,17 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
     // shown centered on their screen via the core image popout share feature.
     html.find('.token-image-share').click(ev => {
       const src = this.actor.img;
-      const PopoutCls = foundry.applications?.apps?.ImagePopout ?? ImagePopout;
-      const popout = new PopoutCls(src, {title: this.actor.name, uuid: this.actor.uuid});
+      // v13 переехал на ApplicationV2: конструктор принимает ОДИН объект опций
+      // ({src, ...}); старая сигнатура (src, {title}) открывала пустое окно.
+      const V2Cls = foundry.applications?.apps?.ImagePopout;
+      const AppV2 = foundry.applications?.api?.ApplicationV2;
+      let popout;
+      if (V2Cls && AppV2 && V2Cls.prototype instanceof AppV2) {
+        popout = new V2Cls({src, uuid: this.actor.uuid, window: {title: this.actor.name}});
+      } else {
+        const PopoutCls = V2Cls ?? ImagePopout;
+        popout = new PopoutCls(src, {title: this.actor.name, uuid: this.actor.uuid});
+      }
       popout.render(true);
       if (typeof popout.shareImage === 'function') {
         popout.shareImage();
@@ -547,7 +556,7 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find('#hpdmg').click(async ev => {
       let adjStr = html.find('#hpadjust').val();
       let adj = parseInt(adjStr);
-      if(String(adj) !== adjStr || adj < -1) {
+      if(String(adj) !== adjStr || adj < 1) {
         ui.notifications.error("Значение урона по ОЗ должно быть положительным числом");
         return;
       }
@@ -558,7 +567,7 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find('#hddmg').click(async ev => {
       let adjStr = html.find('#hdadjust').val();
       let adj = parseInt(adjStr);
-      if(String(adj) !== adjStr || adj < -1) {
+      if(String(adj) !== adjStr || adj < 1) {
         ui.notifications.error("Значение урона по КЗ должно быть положительным числом");
         return;
       }

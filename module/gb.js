@@ -552,7 +552,9 @@ Hooks.once("init", async function () {
                 // post a chat prompt (visible to all) with a one-click activate button.
                 if (dying && !wasDying) {
                     const level = actor.system.level || 0;
-                    const available = level > (actor.system.divineFury?.usedAtLevel || 0);
+                    // Same source of truth as activateDivineFury: the remaining-uses
+                    // counter (which the GM can refill by hand), not usedAtLevel.
+                    const available = (Number(actor.system.divineFury?.remaining ?? 1) || 0) > 0;
                     if (available) {
                         // Bake the token UUID too (like every other chat-card button)
                         // so resolveCardActor can disambiguate an unlinked-token hero
@@ -589,11 +591,12 @@ Hooks.once("init", async function () {
     });
 
     // Floating combat text: whenever an actor's HP (PC) or HD (NPC/token) changes,
-    // scroll a "+N" (green heal) or "-N" (red damage) above each of its tokens. This
-    // runs on preUpdate so the OLD value is still readable for the delta, and on every
-    // connected client so the whole table sees the number, not just whoever applied it.
-    Hooks.on("preUpdateActor", (actor, changed) => {
-        if (!canvas?.ready) return;
+    // scroll a "+N" (green heal) or "-N" (red damage) above each of its tokens.
+    // The pre-hook only fires on the INITIATING client, so the delta (computed
+    // there, while the old value is still readable) is stashed in `options` -
+    // options are broadcast with the update, letting the post-hook below render
+    // the number on EVERY connected client, not just whoever applied the change.
+    Hooks.on("preUpdateActor", (actor, changed, options) => {
         let path = null;
         if (foundry.utils.hasProperty(changed, "system.hp.current")) path = "system.hp.current";
         else if (foundry.utils.hasProperty(changed, "system.hd.current")) path = "system.hd.current";
@@ -603,6 +606,12 @@ Hooks.once("init", async function () {
         if (typeof oldVal !== "number" || typeof newVal !== "number") return;
         const delta = newVal - oldVal;
         if (!delta) return;
+        options.godboundScrollDelta = delta;
+    });
+
+    Hooks.on("updateActor", (actor, changed, options) => {
+        const delta = options?.godboundScrollDelta;
+        if (typeof delta !== "number" || !delta || !canvas?.ready) return;
         const text = `${delta > 0 ? "+" : ""}${delta}`;
         const fill = delta > 0 ? 0x33dd33 : 0xdd3333;
         for (const token of actor.getActiveTokens()) {

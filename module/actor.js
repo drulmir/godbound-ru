@@ -1394,7 +1394,6 @@ export class GodboundActor extends Actor {
             if(item.system.day) templateData.data.actions.day = true;
             if(item.system.scene) templateData.data.actions.scene = true;
             if(item.system.atWill) templateData.data.actions.atWill = true;
-            if(item.system.day) templateData.data.actions.day = true;
         }
         templateData.data.description = this.replaceItemDescriptionMacros(item);
         // Описания из <textarea> держатся на переводах строк — им нужен pre-wrap;
@@ -1405,8 +1404,11 @@ export class GodboundActor extends Actor {
     }
 
     _replaceRollDmgMacro(item, formula) {
-        let replacement = formula.replace('halfLevel', Math.ceil(this.system.level / 2));
-        replacement = replacement.replace('level', this.system.level);
+        // НИП не имеет system.level — как и в toggleAoeZone, «уровнем» служит
+        // макс. КЗ; иначе формула превращалась в «undefinedd8» и падала при клике.
+        const level = Number(this.system.level) || Number(this.system.hd?.max) || 1;
+        let replacement = formula.replace('halfLevel', Math.ceil(level / 2));
+        replacement = replacement.replace('level', level);
         return `<span class="damage-formula-roll" data-formula="${replacement}" data-actor-id="${this.id}" data-damage-source="${item.id}">${replacement}</span>`;
     }
 
@@ -1543,8 +1545,11 @@ export class GodboundActor extends Actor {
                         inp.focus();
                         inp.select();
                         // Enter in the field confirms, so you never touch the mouse.
+                        // stopPropagation is required: Dialog also listens for Enter at the
+                        // document level and would submit the default button too, committing
+                        // the Effort a second time.
                         inp.addEventListener('keydown', async (ev) => {
-                            if (ev.key === 'Enter') { ev.preventDefault(); await commit(html); dlg.close(); }
+                            if (ev.key === 'Enter') { ev.preventDefault(); ev.stopPropagation(); await commit(html); dlg.close(); }
                         });
                     }
                 },

@@ -2,7 +2,7 @@
   "id": "godbound",
   "title": "Godbound",
   "description": "Русскоязычная система для настольной ролевой игры Godbound в Foundry VTT: персонажи, НИП, толпы, Слова и Дары, теургия, артефакты и действия фракций.",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "socket": true,
   "license": "LICENSE.txt",
   "readme": "README.md",

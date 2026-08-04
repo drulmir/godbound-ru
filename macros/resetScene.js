@@ -1,4 +1,7 @@
 game.actors.forEach(a => {
+    // Пропускаем актёров без запаса Усилия (например постройки godbound-city):
+    // их строгая схема данных отвергла бы запись system.effort с ошибкой.
+    if (!a.system?.effort) return;
     a.resetScene();
 });
 ChatMessage.create({

@@ -3,6 +3,10 @@
 // (announce:false), чтобы чат не заполнялся одинаковыми объявлениями.
 (async () => {
     for (const a of game.actors) {
+        // Актёры без запаса Усилия (например постройки модуля godbound-city со
+        // строгой схемой данных) отдых не затрагивает — запись system.effort туда
+        // падала бы с ошибкой валидации и обрывала цикл на середине.
+        if (!a.system?.effort) continue;
         await a.resetDay({announce: false});
     }
     await ChatMessage.create({

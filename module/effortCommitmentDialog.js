@@ -11,7 +11,7 @@ export class EffortCommitmentDialog extends foundry.appv1.api.Dialog {
     }
 
     constructor(actor, item, dialogData, onComplete, opts) {
-        let buttons = [];
+        let buttons = {};
         let commitmentOptions = item.getCommitmentOptions();
         commitmentOptions.forEach(opt => {
             buttons[opt.id] = {
