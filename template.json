@@ -2,6 +2,7 @@
   "Actor": {
     "types": [
       "pc",
+      "hero",
       "npc",
       "faction",
       "godwalker"
@@ -61,6 +62,94 @@
       },
       "effort": {
         "total": 2,
+        "atWill": 0,
+        "scene": 0,
+        "day": 0,
+        "healing": 0
+      },
+      "influence": {
+        "total": 0,
+        "contributed": 0
+      },
+      "dominion": {
+        "total": 0,
+        "contributed": 0,
+        "otherIncome": 0
+      },
+      "giftPoints": {
+        "total": 0,
+        "contributed": 0
+      },
+      "prostheticPoints": {
+        "total": 0
+      },
+      "wealth": {
+        "total": 0,
+        "description": ""
+      },
+      "divineFury": {
+        "remaining": 1,
+        "usedAtLevel": 0,
+        "furyEffort": 0
+      },
+      "notes": ""
+    },
+    "hero": {
+      "description": "",
+      "languages": "",
+      "goal": "",
+      "level": 1,
+      "xp": 0,
+      "hp": {
+        "current": 4,
+        "bonus": 0,
+        "max": 4
+      },
+      "attributes": {
+        "str": {
+          "score": 10
+        },
+        "dex": {
+          "score": 10
+        },
+        "con": {
+          "score": 10
+        },
+        "int": {
+          "score": 10
+        },
+        "wis": {
+          "score": 10
+        },
+        "cha": {
+          "score": 10
+        }
+      },
+      "saves": {
+        "hardiness": {
+          "bonus": 0
+        },
+        "evasion": {
+          "bonus": 0
+        },
+        "spirit": {
+          "bonus": 0
+        }
+      },
+      "toHitBonus": 0,
+      "facts": "",
+      "armor": {
+        "type": "none",
+        "shield": false,
+        "bonus": 0,
+        "desc": "None (Skin or Clothing)",
+        "attribute": "dex",
+        "penalizeHardiness": false,
+        "penalizeEvasion": false,
+        "penalizeSpirit": false
+      },
+      "effort": {
+        "total": 1,
         "atWill": 0,
         "scene": 0,
         "day": 0,

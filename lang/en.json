@@ -1,5 +1,6 @@
 {
   "TYPES.Actor.pc": "Персонаж",
+  "TYPES.Actor.hero": "Герой",
   "TYPES.Actor.npc": "НИП",
   "TYPES.Actor.faction": "Фракция",
   "TYPES.Item.autoHitAttack": "Авто-атака",

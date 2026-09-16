@@ -14,6 +14,7 @@ import {PlayerRollDialog} from "./playerRollDialog.js";
 import {Capitalize, Label, esc, itemChatImage, buildDamageFormula} from "./misc.js";
 import {registerFullAccessSettings, registerFullAccessSocket} from "./fullAccess.js";
 import {importGodboundActorFromFile} from "./export-import.js";
+import {registerLibrarySettings, registerLibraryHooks, initLibrary, syncLibrary, clearLibraryOverrides, setPackLocks} from "./library.js";
 
 // v13+ removed the bare global `renderTemplate`; use the namespaced API (same as
 // the other modules) so chat cards rendered from this file keep working.
@@ -74,7 +75,7 @@ Hooks.once("init", async function () {
     // Register sheet application classes. Core no longer registers default
     // sheets in v13+, so we simply register ours as the default.
     foundry.documents.collections.Actors.registerSheet("godbound", GodboundActorSheet, {
-        types: ["pc", "npc", "faction", "godwalker"],
+        types: ["pc", "hero", "npc", "faction", "godwalker"],
         makeDefault: true
     });
     foundry.documents.collections.Items.registerSheet("godbound", GodboundItemSheet, {
@@ -82,6 +83,13 @@ Hooks.once("init", async function () {
     });
 
     registerFullAccessSettings();
+    registerLibrarySettings();
+    registerLibraryHooks();
+
+    // Macro-friendly API: game.godbound.library.sync() / clearOverrides() / setPackLocks(bool)
+    game.godbound = Object.assign(game.godbound ?? {}, {
+        library: {sync: syncLibrary, clearOverrides: clearLibraryOverrides, setPackLocks}
+    });
 
     // Register system settings
     game.settings.register("godbound", "macroShorthand", {
@@ -282,7 +290,7 @@ Hooks.once("init", async function () {
             // save target succeeds.
             let saveNote = '';
             if (saveType) {
-                let saveTarget = actor.type === 'pc'
+                let saveTarget = actor.isPcLike
                     ? actor.system.computed?.saves?.[saveType]?.save
                     : actor.system.save;
                 if (typeof saveTarget === 'number') {
@@ -301,7 +309,7 @@ Hooks.once("init", async function () {
                 }
             }
             let mitigated = actor._mitigateDamage ? actor._mitigateDamage(amount, damageType, isMagic) : amount;
-            if (actor.type === 'pc') {
+            if (actor.isPcLike) {
                 await actor.applyDamage(amount, damageType, isMagic);
             } else {
                 await actor.applyHDDamage(amount, damageType, isMagic);
@@ -524,7 +532,7 @@ Hooks.once("init", async function () {
         // shown on the sheet refills by itself (the GM can still set it by hand).
         const touchedLevel = ("system.level" in changed)
             || foundry.utils.hasProperty(changed, "system.level");
-        if (actor.type === 'pc' && touchedLevel) {
+        if (actor.isPcLike && touchedLevel) {
             const level = actor.system.level || 0;
             const usedAt = actor.system.divineFury?.usedAtLevel || 0;
             const left = Number(actor.system.divineFury?.remaining ?? 1) || 0;
@@ -542,7 +550,7 @@ Hooks.once("init", async function () {
         const touchedHd = foundry.utils.hasProperty(changed, "system.hd.current");
         if (!touchedHp && !touchedHd) return;
         try {
-            if (actor.type === 'pc' && touchedHp) {
+            if (actor.isPcLike && touchedHp) {
                 const dying = (actor.system.hp?.current ?? 1) <= 0;
                 const wasDying = actor.statuses.has('dying');
                 if (wasDying !== dying) {
@@ -801,6 +809,10 @@ const BACKFILL_VERSION = 3;
 
 Hooks.once("ready", async () => {
     registerFullAccessSocket();
+    // Unlock the system compendiums for the GM and restore any library edits the
+    // world remembers (see library.js). Runs before the backfills so a restored
+    // pack is already in place if anything below reads from it.
+    await initLibrary();
     // Only the PRIMARY GM runs the backfills (so a multi-GM table doesn't run them
     // several times over), and only until this world has been stamped with the
     // current BACKFILL_VERSION - after that the whole world scan is skipped.
@@ -1017,7 +1029,7 @@ function gbTokenTooltipHtml(actor) {
     const rows = [];
     const row = (label, value) => rows.push(
         `<div class="gb-tt-row"><span>${label}</span><b>${value}</b></div>`);
-    if (actor.type === 'pc') {
+    if (actor.isPcLike) {
         row('Уровень', e(sys.level));
         row('ОЗ', `${e(sys.hp?.current)} / ${e(sys.computed?.hp?.max)}`);
         row('КБ', e(sys.computed?.armor?.ac));

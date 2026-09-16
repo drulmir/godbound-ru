@@ -22,6 +22,18 @@ export const frayAttackData = () => ({
     system: {damageRoll: '1d8', fray: true}
 });
 
+// Чудо «Успех на спасброске» — есть и у Богорождённого, и у Героя (смертный
+// герой тратит своё единственное Усилие на автоуспех проваленного спасброска).
+export const saveSuccessMiracleData = () => ({
+    name: 'Успех на спасброске', type: 'divineMiracle',
+    img: 'icons/svg/holy-shield.svg',
+    system: {
+        description: "Преуспеть в проваленном спасброске",
+        effortCost: 1,
+        instant: true,
+    }
+});
+
 // Старые версии системы ссылались на иконки модуля game-icons-net, который
 // может быть не установлен — тогда предметы остаются без иконки. Замена на
 // иконки из ядра Foundry (существуют в любой установке).
@@ -64,6 +76,16 @@ export const bloodWaterGiftData = () => ({
 export class GodboundActor extends Actor {
 
     /**
+     * "Герой" (heroic mortal from Секреты Аркема) shares the whole PC data model
+     * and sheet: same attributes, saves, Effort, gifts, artifacts. The only rule
+     * differences live in _preparePcData (flat, hand-set max HP) and in the sheet
+     * template (no Dominion). Everything else that says "pc" means both.
+     */
+    get isPcLike() {
+        return this.type === 'pc' || this.type === 'hero';
+    }
+
+    /**
      * system.json's primaryTokenAttribute/secondaryTokenAttribute are only a
      * suggested default for the Token Config UI - they don't actually get
      * written onto a new Actor's prototypeToken.bar1/bar2. Without this, no
@@ -73,6 +95,9 @@ export class GodboundActor extends Actor {
      */
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
+        // A library restore (library.js) re-creates a compendium actor exactly as
+        // the GM last saved it, so none of the new-actor defaults below apply.
+        if (options.godboundRestore) return;
         // Vision on by default for every token type: sight works without any light
         // source out to 120 units with a 160° arc. Applied whenever sight isn't
         // already switched on - so brand-new actors and compendium enemies (whose
@@ -87,7 +112,7 @@ export class GodboundActor extends Actor {
         // Only pc/npc populate computed.hp.bar / computed.armor.bar. Pointing any
         // other type's token at those (empty) paths just shows a blank bar, so
         // restrict the bar assignment to the types that actually fill them.
-        if (this.type === 'pc' || this.type === 'npc') {
+        if (this.isPcLike || this.type === 'npc') {
             this.updateSource({
                 prototypeToken: {
                     bar1: {attribute: "computed.hp.bar"},
@@ -123,19 +148,17 @@ export class GodboundActor extends Actor {
                 this.updateSource({items: [...incoming, frayAttackData()]});
             }
         }
+        // A hero starts with just the save-success miracle: the rules give a
+        // heroic mortal Effort 1 to auto-succeed a failed save "как Обожествлённый",
+        // but no fray die, no smites and no dispel.
+        if (this.type === 'hero' && !(data.items && data.items.length)) {
+            this.updateSource({items: [saveSuccessMiracleData()]});
+        }
         if (this.type === 'pc' && !(data.items && data.items.length)) {
             this.updateSource({
                 items: [
                     frayAttackData(),
-                    {
-                        name: 'Успех на спасброске', type: 'divineMiracle',
-                        img: 'icons/svg/holy-shield.svg',
-                        system: {
-                            description: "Преуспеть в проваленном спасброске",
-                            effortCost: 1,
-                            instant: true,
-                        }
-                    },
+                    saveSuccessMiracleData(),
                     {
                         name: 'Развеять эффект', type: 'divineMiracle',
                         img: 'icons/svg/daze.svg',
@@ -222,7 +245,7 @@ export class GodboundActor extends Actor {
      */
     async modifyTokenAttribute(attribute, value, isDelta = false, isBar = true) {
         if (attribute === "computed.hp.bar") {
-            if (this.type === "pc") {
+            if (this.isPcLike) {
                 const max = this.system.computed?.hp?.max ?? Infinity;
                 let current = isDelta ? this.system.hp.current + value : value;
                 current = Math.min(Math.max(current, 0), max);
@@ -244,7 +267,7 @@ export class GodboundActor extends Actor {
 
         // Make separate methods for each Actor type (character, npc, etc.) to keep
         // things organized.
-        if (this.type === 'pc') this._preparePcData();
+        if (this.isPcLike) this._preparePcData();
 
         if (this.type === 'godwalker') this._prepareGodwalkerData();
 
@@ -252,7 +275,7 @@ export class GodboundActor extends Actor {
 
         if (this.type === 'faction') this._prepareFactionData();
 
-        if (this.type === 'pc' || this.type === 'npc') {
+        if (this.isPcLike || this.type === 'npc') {
             this._preparePassives();
             this._prepareProstheticPoints();
         }
@@ -553,9 +576,14 @@ export class GodboundActor extends Actor {
         data.computed.giftPoints.available = data.giftPoints.total - data.computed.giftPoints.spent;
 
         data.computed.hp = {};
-        data.computed.hp.max = 8 + data.computed.attributes.con.mod + (
-            (data.level - 1) * (4 + Math.ceil(data.computed.attributes.con.mod / 2))
-        );
+        // A Godbound's max HP is derived from level and Constitution. A hero's is
+        // a plain stored number (4 + Con mod + talents by the book, min 4) that
+        // the player sets on the sheet by hand.
+        data.computed.hp.max = this.type === 'hero'
+            ? Math.max(1, Number(data.hp.max) || 0)
+            : 8 + data.computed.attributes.con.mod + (
+                (data.level - 1) * (4 + Math.ceil(data.computed.attributes.con.mod / 2))
+            );
         // Floor current HP at 0 for display (matches the persisted-value floor
         // enforced in applyDamage/_preUpdate) so a stale negative value on an
         // existing actor doesn't show/report as negative either.
@@ -966,7 +994,7 @@ export class GodboundActor extends Actor {
                 // Armor Class. Any other type (e.g. faction) has none, so leave
                 // targetAc null rather than reading an undefined field - otherwise
                 // `hitNumber <= undefined` renders a bogus miss on every roll.
-                targetAc = firstActor.type === 'pc' ? firstActor.system.computed?.armor?.ac
+                targetAc = firstActor.isPcLike ? firstActor.system.computed?.armor?.ac
                     : firstActor.type === 'npc' ? firstActor.system.ac
                     : null;
             }
@@ -1810,7 +1838,7 @@ export class GodboundActor extends Actor {
     async resetDay({announce = true} = {}) {
         // Healing Effort is committed for the day, so a night's rest hands it back too.
         const patch = {effort: {day: 0, scene: 0, healing: 0}};
-        if (this.type === 'pc') {
+        if (this.isPcLike) {
             const max = this.system.computed?.hp?.max;
             if (typeof max === 'number') patch.hp = {current: max};
             // Divine Fury does NOT refresh on rest (only on gaining a level), but a
@@ -1949,7 +1977,7 @@ export class GodboundActor extends Actor {
     // bonus HP - bonus HP is a separate temporary pool, not something "healed".
     async applyHeal(amount) {
         if (!amount || amount <= 0) return;
-        if (this.type === 'pc') {
+        if (this.isPcLike) {
             let max = this.system.computed?.hp?.max ?? Infinity;
             let current = Math.min(max, this.system.hp.current + amount);
             await this.update({system: {hp: {current}}});

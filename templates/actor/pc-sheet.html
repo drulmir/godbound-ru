@@ -10,7 +10,7 @@
         <a class="item" data-tab="prosthetics">Протезы</a>
         <a class="item" data-tab="wealth">Богатство</a>
         <a class="item" data-tab="artifacts">Артефакты</a>
-        <a class="item" data-tab="projects">Проекты</a>
+        {{#unless isHero}}<a class="item" data-tab="projects">Проекты</a>{{/unless}}
         <a class="item" data-tab="notes" style="flex-grow:2">Факты</a>
     </nav>
 
@@ -165,7 +165,7 @@
                                 </tr>
                                 <tr>
                                     <td>Макс. ОЗ</td>
-                                    <td colspan="3" style="padding-left: 4px;">{{system.computed.hp.max}}</td>
+                                    <td colspan="3" style="padding-left: 4px;"{{#if isHero}} data-tooltip="Меняется на вкладке «Бой»"{{/if}}>{{system.computed.hp.max}}</td>
                                 </tr>
                                 <tr>
                                     <td>Урон/Лечение</td>
@@ -227,6 +227,7 @@
                             <td>{{system.computed.influence.available}}</td>
                             <td></td>
                         </tr>
+                        {{#unless isHero}}
                         <tr>
                             <td>Домино</td>
                             <td><input type="text" data-dtype="Number" name="system.dominion.total" value="{{system.dominion.total}}" /></td>
@@ -234,6 +235,7 @@
                             <td>{{system.computed.dominion.available}}</td>
                             <td>{{system.computed.dominion.income}}</td>
                         </tr>
+                        {{/unless}}
                         <tr>
                             <td>Очки Даров</td>
                             <td><input type="text" data-dtype="Number" name="system.giftPoints.total" value="{{system.giftPoints.total}}" data-tooltip="Всего доступных очков Даров" /></td>
@@ -615,6 +617,7 @@
 
                 </div>
             </div>
+            {{#unless isHero}}
             <div class="container col" style="margin-top:16px;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                     <input type="button" class="fray-roll" value="Схватка (Кость Схватки)"
@@ -622,6 +625,7 @@
                     <span style="font-size:12px;opacity:0.8;">Раз в раунд · одна цель (Target) с HD ниже вашего уровня.</span>
                 </div>
             </div>
+            {{/unless}}
             <div class="container row" style="margin-top:32px;">
                 <div class="container col" style="width:50%;">
                     <div class="container col">
@@ -731,7 +735,11 @@
                             </tr>
                             <tr>
                                 <td>Макс. ОЗ</td>
+                                {{#if isHero}}
+                                <td><input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number" class="compact" data-tooltip="У Героя макс. ОЗ задаётся вручную: 4 + мод. Телосложения + таланты" /></td>
+                                {{else}}
                                 <td style="padding-left:4px;">{{system.computed.hp.max}}</td>
+                                {{/if}}
                             </tr>
                             </tbody>
                         </table>
@@ -908,6 +916,7 @@
             </div>
         </div>
 
+        {{#unless isHero}}
         <div class="tab projects" data-group="primary" data-tab="projects">
             <div class="container col">
                 <h2 style="display:flex;justify-content: space-between;">
@@ -981,6 +990,7 @@
                 </div>
             </div>
         </div>
+        {{/unless}}
 
         <div class="tab prosthetics" data-group="primary" data-tab="prosthetics">
             <div class="container col">

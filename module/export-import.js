@@ -22,15 +22,7 @@ function _fileSafe(name) {
 
 /** Trigger a browser download of a text payload. */
 function _download(filename, text) {
-    const blob = new Blob([text], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    foundry.utils.saveDataToFile(text, "application/json", filename);
 }
 
 /** Open a file picker and resolve with the selected file's text (or null). */

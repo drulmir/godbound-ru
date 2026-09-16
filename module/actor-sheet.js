@@ -25,7 +25,9 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   get template() {
     const path = "systems/godbound/templates/actor";
-    return `${path}/${this.actor.type}-sheet.html`;
+    // A hero uses the PC sheet; the template hides the Godbound-only bits via isHero.
+    const type = this.actor.type === 'hero' ? 'pc' : this.actor.type;
+    return `${path}/${type}-sheet.html`;
   }
   /* -------------------------------------------- */
 
@@ -96,7 +98,9 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
     context.isGM = game.user.isGM;
     // Custom per-character sheet background (null → default parchment via CSS).
     context.sheetBg = this.actor.getFlag('godbound', 'sheetBg') || null;
-    if (this.actor.type === 'pc' || this.actor.type === 'npc') {
+    // Hero sheet = PC sheet minus Dominion, plus an editable max HP.
+    context.isHero = this.actor.type === 'hero';
+    if (this.actor.isPcLike || this.actor.type === 'npc') {
       const arts = this.actor.system.computed.arts || {};
       context.artCategories = ART_CATEGORIES.map(c => ({
         id: c.id,
@@ -489,7 +493,7 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find('.quick-damage-btn').click(async ev => {
       const amount = parseInt($(ev.currentTarget).siblings('.quick-hp-amount').val()) || 0;
       if (amount <= 0) return;
-      if (this.actor.type === 'pc') await this.actor.applyDamage(amount);
+      if (this.actor.isPcLike) await this.actor.applyDamage(amount);
       else await this.actor.applyHDDamage(amount);
     });
 
