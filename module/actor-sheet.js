@@ -238,11 +238,11 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
       this.actor.addGiftAttack(item);
     });
 
-    // Spawn/remove the subtle AoE zone template of a power on the current scene.
+    // Клик — поставить ещё одну зону силы на сцену, Shift+клик — убрать все её зоны.
     html.find('.aoe-zone-toggle').click(ev => {
       const li = $(ev.currentTarget).parents('.item');
       const item = this.actor.items.get(li.data("itemId"));
-      this.actor.toggleAoeZone(item);
+      this.actor.toggleAoeZone(item, {remove: ev.shiftKey});
     });
 
     // Single "use" button for powers: commits Effort per the power's settings

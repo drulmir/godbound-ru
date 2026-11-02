@@ -807,13 +807,13 @@ export class GodboundActor extends Actor {
         return runningTotal;
     }
 
-    // Toggle a barely-visible AoE zone template on the canvas for a power
+    // Place a barely-visible AoE zone template on the canvas for a power
     // (gift / art / invocation) whose description defines an area in feet.
-    // First click spawns the zone centered on the actor's token (drag it to a
-    // point afterwards if the effect is targeted); second click removes it.
-    // The template is an ordinary MeasuredTemplate, so it can also be deleted
-    // from the template layer like any other.
-    async toggleAoeZone(item) {
+    // Каждый клик ставит НОВУЮ зону — силу вроде «Лиан» можно вызвать несколько
+    // раз, и прежние зоны остаются на карте. Shift+клик убирает все зоны этой
+    // силы. Это обычные MeasuredTemplate, их можно удалять и поштучно со слоя
+    // шаблонов (выделить → Delete).
+    async toggleAoeZone(item, {remove = false} = {}) {
         const cfg = item?.system?.aoe;
         const baseRadius = Number(cfg?.radius) || 0;
         if (!cfg?.enabled || baseRadius <= 0) {
@@ -824,11 +824,16 @@ export class GodboundActor extends Actor {
             ui.notifications.warn('Нет активной сцены для размещения зоны.');
             return;
         }
-        const existing = canvas.scene.templates.filter(t =>
-            t.flags?.godbound?.zoneItemId === item.id &&
-            t.flags?.godbound?.zoneActorId === this.id);
-        if (existing.length) {
+        if (remove) {
+            const existing = canvas.scene.templates.filter(t =>
+                t.flags?.godbound?.zoneItemId === item.id &&
+                t.flags?.godbound?.zoneActorId === this.id);
+            if (!existing.length) {
+                ui.notifications.info(`Зон «${item.name}» на сцене нет.`);
+                return;
+            }
             await canvas.scene.deleteEmbeddedDocuments('MeasuredTemplate', existing.map(t => t.id));
+            ui.notifications.info(`Убрано зон «${item.name}»: ${existing.length}.`);
             return;
         }
         // «на уровень» — множим на уровень персонажа (у НИП — на макс. КЗ).
@@ -1469,11 +1474,17 @@ export class GodboundActor extends Actor {
     }
 
     _calcActualEffortCost(item, effortCost) {
-        if(effortCost) return effortCost;
+        // Явно переданная цена (в т.ч. 0 из окна «сколько Усилия») — как есть.
+        // Раньше `if (effortCost)` считал 0 «не задано», и 0 превращался в 1.
+        if (effortCost !== undefined && effortCost !== null && effortCost !== '') {
+            const n = Math.floor(Number(effortCost));
+            return Number.isFinite(n) && n > 0 ? n : 0;
+        }
         if(['divineMiracle', 'artifactPower', 'art', 'artLevel'].includes(item.type)) {
-            // Respect the power's configured cost (minimum 1). Was Math.min(x, 1),
-            // which silently capped every cost at 1 so effortCost > 1 was free.
-            return Math.max(item.system.effortCost || 1, 1);
+            // Цена из листа силы; 0 тоже допустим (бесплатное применение),
+            // пустое поле — 1.
+            const n = Math.floor(Number(item.system.effortCost));
+            return Number.isFinite(n) && item.system.effortCost !== '' && item.system.effortCost !== null ? Math.max(n, 0) : 1;
         }
         return 1;
     }
@@ -1490,6 +1501,8 @@ export class GodboundActor extends Actor {
             return this.commitEffortAtWill(item);
         }
         effortCost = this._calcActualEffortCost(item, effortCost);
+        // Цена 0 — сила применяется бесплатно: Усилие не трогаем, только чат.
+        if (effortCost === 0) return this.demonstratePower(item);
         let target = this._determineEffortTarget(item);
         if (target.canSpendEffort(effortCost)) {
             await target.update({system: {effort: {day: target.system.effort.day + effortCost}}});
@@ -1499,6 +1512,8 @@ export class GodboundActor extends Actor {
     }
     async commitEffortForScene(item, effortCost) {
         effortCost = this._calcActualEffortCost(item, effortCost);
+        // Цена 0 — сила применяется бесплатно: Усилие не трогаем, только чат.
+        if (effortCost === 0) return this.demonstratePower(item);
         let target = this._determineEffortTarget(item);
         if (target.canSpendEffort(effortCost)) {
             await target.update({system: {effort: {scene: target.system.effort.scene + effortCost}}});
@@ -1521,6 +1536,8 @@ export class GodboundActor extends Actor {
             return;
         }
         effortCost = this._calcActualEffortCost(item, effortCost);
+        // Цена 0 — сила применяется бесплатно: Усилие не трогаем, только чат.
+        if (effortCost === 0) return this.demonstratePower(item);
         let target = this._determineEffortTarget(item);
         if(target.canSpendEffort(effortCost)) {
             await target.update({system: {effort: {atWill: target.system.effort.atWill + effortCost}}});
@@ -1556,7 +1573,7 @@ export class GodboundActor extends Actor {
             `<div class="godbound gb-dialog">` +
             `<p class="gb-dialog__text">«${esc(item.name)}» — сколько Усилия приложить` +
             `${label ? ` <span style="opacity:.7;">(${label})</span>` : ''}?</p>` +
-            `<input type="number" class="gb-effort-amount" value="${def}" min="1" step="1" ` +
+            `<input type="number" class="gb-effort-amount" value="${def}" min="0" step="1" ` +
             `style="width:100%;text-align:center;font-size:18px;font-weight:bold;">` +
             `</div>`;
 
@@ -1564,7 +1581,8 @@ export class GodboundActor extends Actor {
             const commit = async (html) => {
                 const root = html?.[0] ?? html;
                 let amount = Math.floor(Number(root?.querySelector('.gb-effort-amount')?.value));
-                if (!Number.isFinite(amount) || amount < 1) amount = 1;
+                // 0 — допустимо: применить силу, не тратя Усилия.
+                if (!Number.isFinite(amount) || amount < 0) amount = 0;
                 await this[fnName](item, amount);
                 resolve(amount);
             };
