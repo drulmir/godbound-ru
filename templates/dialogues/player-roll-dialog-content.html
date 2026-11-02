@@ -1,8 +1,13 @@
 <div class="godbound gb-dialog">
     <h2 class="gb-dialog__title">{{rollType}}</h2>
-    <select id="modifier" name="modifier">
-        <option value="0">Обычно (0 модификатор)</option>
-        <option value="4">Легко (+4 модификатор)</option>
-        <option value="-4">Трудно (-4 модификатор)</option>
-    </select>
+    {{!-- Быстрые кнопки выставляют стандартные ±4, в поле можно вписать любое число. --}}
+    <div class="gb-mod-presets">
+        <button type="button" class="gb-mod-preset" data-mod="-4">Трудно −4</button>
+        <button type="button" class="gb-mod-preset active" data-mod="0">Обычно 0</button>
+        <button type="button" class="gb-mod-preset" data-mod="4">Легко +4</button>
+    </div>
+    <label class="gb-mod-custom">
+        <span>Модификатор:</span>
+        <input id="modifier" name="modifier" type="number" step="1" value="0" />
+    </label>
 </div>

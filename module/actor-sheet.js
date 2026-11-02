@@ -3,7 +3,7 @@
  * @extends {foundry.appv1.sheets.ActorSheet}
  */
 import {PlayerRollDialog} from "./playerRollDialog.js";
-import {TypeNames, ArtCategoryName, Label, ART_CATEGORIES} from "./misc.js";
+import {TypeNames, ArtCategoryName, Label, ART_CATEGORIES, modifierLabel} from "./misc.js";
 import {hasFullEditPrivilege, requestFullAccess} from "./fullAccess.js";
 import {exportGodboundActor, importGodboundActorFromFile} from "./export-import.js";
 
@@ -425,7 +425,7 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
         };
         let templateData = {
           title: 'Проверка характеристики',
-          details: `${Label(attr)} - ${data.modifier < 0 ? 'Трудно' : data.modifier > 0 ? 'Легко' : 'Обычно'}`,
+          details: `${Label(attr)} - ${modifierLabel(data.modifier)}`,
           data: data,
         }
         // Godbound attribute check: roll 1d20 (+ situational modifier) against the
@@ -519,7 +519,7 @@ export class GodboundActorSheet extends foundry.appv1.sheets.ActorSheet {
         };
         let templateData = {
           title: 'Спасбросок',
-          details: `${Label(save)} - ${data.modifier < 0 ? 'Трудно' : data.modifier > 0 ? 'Легко' : 'Обычно'}`,
+          details: `${Label(save)} - ${modifierLabel(data.modifier)}`,
           data: data,
         }
         let roll = new Roll('1d20 + @difficulty', {

@@ -39,5 +39,20 @@ export class PlayerRollDialog extends foundry.appv1.api.Dialog {
 
     activateListeners(html) {
         super.activateListeners(html);
+        const $input = html.find('#modifier');
+        const $presets = html.find('.gb-mod-preset');
+        // Подсветить пресет, совпадающий с введённым числом (или ни одного).
+        const syncActive = () => {
+            const v = SafeNum($input.val());
+            $presets.each((_, el) => el.classList.toggle('active', Number(el.dataset.mod) === v));
+        };
+        $presets.on('click', ev => {
+            ev.preventDefault();
+            $input.val(ev.currentTarget.dataset.mod);
+            syncActive();
+            $input.trigger('focus');
+        });
+        $input.on('input change', syncActive);
+        // Enter → «Бросить» уже обрабатывает сам Dialog (кнопка default: 'yes').
     }
 }

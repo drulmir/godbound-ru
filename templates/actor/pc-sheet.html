@@ -8,8 +8,7 @@
         <a class="item" data-tab="passives">Пассивки</a>
         <a class="item" data-tab="combat">Бой</a>
         <a class="item" data-tab="prosthetics">Протезы</a>
-        <a class="item" data-tab="wealth">Богатство</a>
-        <a class="item" data-tab="artifacts">Артефакты</a>
+        <a class="item" data-tab="wealth">Имущество</a>
         {{#unless isHero}}<a class="item" data-tab="projects">Проекты</a>{{/unless}}
         <a class="item" data-tab="notes" style="flex-grow:2">Факты</a>
     </nav>
@@ -834,10 +833,9 @@
                     {{/each}}
                 </ol>
             </div>
-        </div>
 
-        <div class="tab artifacts" data-group="primary" data-tab="artifacts">
-            <div class="container col">
+            {{!-- Артефакты — на той же вкладке «Имущество», что и Богатство/Сокровища. --}}
+            <div class="container col" style="margin-top:16px;">
                 <h2 style="display:flex;justify-content: space-between;">
                     <span>Артефакты</span>
                     <i class="fas fa-plus itemAdder" data-tooltip="Добавить" data-item-type="artifact"></i>

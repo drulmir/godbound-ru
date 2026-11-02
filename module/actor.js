@@ -1,4 +1,4 @@
-import {TypeNames, Label, esc, isPlainDescription, itemChatImage, buildDamageFormula} from "./misc.js";
+import {TypeNames, Label, esc, isPlainDescription, itemChatImage, buildDamageFormula, powerTagsHtml} from "./misc.js";
 import {EffortCommitmentDialog} from "./effortCommitmentDialog.js";
 
 const renderTemplate = foundry.applications.handlebars.renderTemplate;
@@ -962,7 +962,8 @@ export class GodboundActor extends Actor {
         }
         let templateData = {
             title: `Атака`,
-            data: {},
+            // Атака-Искусство/сила несёт флаги активации — показываем их значками.
+            data: {tagsHtml: powerTagsHtml(item)},
         };
         // Godbound armor is a descending target number (lower AC = harder to
         // hit), so build the roll to directly produce the hit number: the
@@ -1149,17 +1150,24 @@ export class GodboundActor extends Actor {
                 `</div></div>`;
         }
         const theurgyDesc = this.replaceItemDescriptionMacros(item);
+        // Цели на момент броска — спас потом бросается за них (см. gb.js).
+        const targets = Array.from(game.user.targets).filter(t => t.actor).map(t => targetRef(t));
+        const tagsHtml = powerTagsHtml(item);
         chatData.content =
             `<div class="godbound chat-block gb-card gb-card--power">` +
             `<h2 class="gb-title"><span class="gb-title__text">${esc(item.name)}</span></h2>` +
+            (tagsHtml ? `<div class="gb-tags">${tagsHtml}</div>` : '') +
             `<div class="gb-desc${isPlainDescription(theurgyDesc) ? ' gb-desc--pre' : ''}">${theurgyDesc}</div>` +
             `<div class="gb-note">Спасбросок цели: <b>${esc(saveLabel)}</b>` +
             (formula ? ' — успех сводит эффект на нет, провал наносит урон ниже.' : ' — успех сводит эффект на нет, провал — эффект действует.') + `</div>` +
             `<div class="gb-actions"><div class="gb-btns gb-btns--1">` +
             `<button type="button" class="gb-btn gb-btn--primary gift-save-roll-btn" data-save="${saveType}" data-gift-name="${esc(item.name)}"` +
             (formula ? ` data-dmg-normal="${normal}" data-dmg-straight="${straight}" data-damage-type="${damageType}" data-is-magic="true"` : '') +
+            (targets.length ? ` data-targets="${esc(JSON.stringify(targets))}"` : '') +
             `><i class="fas fa-shield-halved"></i> Бросить спасбросок (${esc(saveLabel)})</button>` +
-            `</div></div>` +
+            `</div>` +
+            (targets.length ? `<div class="gb-hint">Цели: ${targets.map(t => esc(t.name)).join(', ')}</div>` : '') +
+            `</div>` +
             damageBlock + `</div>`;
         if (rolls.length) { chatData.rolls = rolls; chatData.sound = CONFIG.sounds.dice; }
         await ChatMessage.create(chatData);
@@ -1414,14 +1422,16 @@ export class GodboundActor extends Actor {
         templateData.data.actor = this;
         templateData.data.item = item;
         templateData.data.itemImg = itemChatImage(item);
-        if(effortCommitment) {
-            templateData.data.effort = {[effortCommitment]: true};
-        }
-        if(!effortCommitment) {
-            templateData.data.actions = {};
-            if(item.system.day) templateData.data.actions.day = true;
-            if(item.system.scene) templateData.data.actions.scene = true;
-            if(item.system.atWill) templateData.data.actions.atWill = true;
+        // Значки активации/Усилия (Постоянно, Мгновенно, По желанию, День…).
+        templateData.data.tagsHtml = powerTagsHtml(item, effortCommitment);
+        // Цели, наведённые в момент применения силы: «Спасбросок цели» потом
+        // бросается именно за них, даже если у бросающего нет прав на их листы.
+        const saveType = item.system?.saveType;
+        if (saveType && saveType !== 'none') {
+            templateData.data.targets = Array.from(game.user.targets)
+                .filter(t => t.actor)
+                .map(t => targetRef(t));
+            templateData.data.targetsJson = JSON.stringify(templateData.data.targets);
         }
         templateData.data.description = this.replaceItemDescriptionMacros(item);
         // Описания из <textarea> держатся на переводах строк — им нужен pre-wrap;

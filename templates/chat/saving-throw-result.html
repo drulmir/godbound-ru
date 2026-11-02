@@ -22,7 +22,7 @@
 
         {{#if result.isFailure}}
         <div class="gb-autosave">
-            <span class="instant-auto-save" data-actor-id="{{data.actor.id}}"><i class="fas fa-sun"></i> Авто-спасбросок</span>
+            <span class="instant-auto-save" data-actor-id="{{data.actor.id}}" data-token-uuid="{{data.tokenUuid}}" data-tooltip="Тратит Усилие цели — применяет её владелец"><i class="fas fa-sun"></i> Авто-спасбросок</span>
         </div>
         {{/if}}
 
@@ -31,8 +31,8 @@
             {{#if data.damage.rollHtml}}{{{data.damage.rollHtml}}}{{/if}}
             <div class="gb-hint">Спасбросок провален — нанести урон:</div>
             <div class="gb-btns">
-                <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{data.damage.targetActorId}}" data-amount="{{data.damage.normal}}" data-damage-type="{{data.damage.damageType}}" data-is-magic="{{data.damage.isMagic}}">Обычный урон</button>
-                <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{data.damage.targetActorId}}" data-amount="{{data.damage.straight}}" data-damage-type="{{data.damage.damageType}}" data-is-magic="{{data.damage.isMagic}}">Прямой урон</button>
+                <button type="button" class="gb-btn apply-damage-btn" data-target-actor-id="{{data.damage.targetActorId}}" data-target-token-uuid="{{data.damage.targetTokenUuid}}" data-amount="{{data.damage.normal}}" data-damage-type="{{data.damage.damageType}}" data-is-magic="{{data.damage.isMagic}}">Обычный урон</button>
+                <button type="button" class="gb-btn gb-btn--danger apply-damage-btn" data-target-actor-id="{{data.damage.targetActorId}}" data-target-token-uuid="{{data.damage.targetTokenUuid}}" data-amount="{{data.damage.straight}}" data-damage-type="{{data.damage.damageType}}" data-is-magic="{{data.damage.isMagic}}">Прямой урон</button>
             </div>
         </div>
         {{/if}}

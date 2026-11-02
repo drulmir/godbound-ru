@@ -11,7 +11,7 @@ import {GodboundItemSheet} from "./item-sheet.js";
 import {GodboundActorSheet} from "./actor-sheet.js";
 import {EffortCommitmentDialog} from "./effortCommitmentDialog.js";
 import {PlayerRollDialog} from "./playerRollDialog.js";
-import {Capitalize, Label, esc, itemChatImage, buildDamageFormula} from "./misc.js";
+import {Capitalize, Label, esc, itemChatImage, buildDamageFormula, modifierLabel} from "./misc.js";
 import {registerFullAccessSettings, registerFullAccessSocket} from "./fullAccess.js";
 import {importGodboundActorFromFile} from "./export-import.js";
 import {registerLibrarySettings, registerLibraryHooks, initLibrary, syncLibrary, clearLibraryOverrides, setPackLocks} from "./library.js";
@@ -19,6 +19,9 @@ import {registerLibrarySettings, registerLibraryHooks, initLibrary, syncLibrary,
 // v13+ removed the bare global `renderTemplate`; use the namespaced API (same as
 // the other modules) so chat cards rendered from this file keep working.
 const renderTemplate = foundry.applications.handlebars.renderTemplate;
+
+// Канал сокета системы (тот же, что у запроса полного доступа в fullAccess.js).
+const GB_SOCKET = "system.godbound";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -264,6 +267,50 @@ Hooks.once("init", async function () {
         }
     });
 
+    /** Применить урон с карточки: ОЗ у героев, КЗ у НИП/толп. */
+    async function applyCardDamage(actor, amount, damageType, isMagic) {
+        if (actor.isPcLike) {
+            await actor.applyDamage(amount, damageType, isMagic);
+        } else {
+            await actor.applyHDDamage(amount, damageType, isMagic);
+        }
+    }
+
+    /**
+     * ГМ-сторона ретрансляции урона. Игрок без прав на цель шлёт сюда запрос;
+     * обрабатывает только ОСНОВНОЙ активный ГМ (иначе урон лёг бы по разу на
+     * каждого ГМ/ассистента). Пакет сокета не подписан, поэтому урон
+     * принимается, только если он «покрыт» реальной карточкой в чате: сообщение
+     * существует, его видит запросивший, и в нём есть кнопка урона/спасброска
+     * на сумму не меньше запрошенной (спас за половину даёт меньше — это ок).
+     */
+    function registerDamageRelay() {
+        game.socket.on(GB_SOCKET, async data => {
+            if (data?.type !== 'applyDamage') return;
+            if (game.users?.activeGM !== game.user) return;
+            const requester = game.users.get(data.userId);
+            const message = game.messages.get(data.messageId);
+            const amount = parseInt(data.amount);
+            if (!requester || !message || isNaN(amount) || amount < 0) return;
+            // message.visible считается для ГМ (он видит всё), поэтому шёпот
+            // проверяем вручную: запросивший — автор или адресат сообщения.
+            const whisper = message.whisper ?? [];
+            if (whisper.length && !whisper.includes(requester.id) && message.author?.id !== requester.id) return;
+            const html = String(message.content ?? '');
+            const numbers = [...html.matchAll(/data-(?:amount|dmg-normal|dmg-straight)="(-?\d+)"/g)].map(m => Number(m[1]));
+            if (!numbers.some(n => n >= amount)) {
+                console.warn('Godbound | отклонён запрос урона без подходящей карточки', data);
+                return;
+            }
+            const actor = resolveCardActor({tokenUuid: data.tokenUuid, actorId: data.actorId});
+            if (!actor) return;
+            const isMagic = data.isMagic === true || data.isMagic === 'true';
+            await applyCardDamage(actor, amount, data.damageType, isMagic);
+            ui.notifications.info(`${requester.name}: урон ${amount} → ${actor.name}`);
+        });
+    }
+    game.Godbound.registerDamageRelay = registerDamageRelay;
+
     $(document).on('click', '.apply-damage-btn', async ev => {
         let $btn = $(ev.currentTarget);
         let actorId = $btn.data('targetActorId');
@@ -309,10 +356,26 @@ Hooks.once("init", async function () {
                 }
             }
             let mitigated = actor._mitigateDamage ? actor._mitigateDamage(amount, damageType, isMagic) : amount;
-            if (actor.isPcLike) {
-                await actor.applyDamage(amount, damageType, isMagic);
+            let relayed = false;
+            if (actor.isOwner) {
+                await applyCardDamage(actor, amount, damageType, isMagic);
             } else {
-                await actor.applyHDDamage(amount, damageType, isMagic);
+                // Чужая цель (обычно НИП ГМа): обновить её лист игрок не вправе,
+                // поэтому урон уходит активному ГМ, и тот применяет его у себя.
+                if (!game.users?.activeGM) {
+                    ui.notifications.warn("Нет активного Ведущего — некому применить урон к чужой цели.");
+                    return;
+                }
+                const messageId = $btn.closest('[data-message-id]').data('messageId');
+                game.socket.emit(GB_SOCKET, {
+                    type: 'applyDamage',
+                    userId: game.user.id,
+                    messageId,
+                    tokenUuid: actor.token?.uuid ?? tokenUuid ?? null,
+                    actorId: actor.id,
+                    amount, damageType, isMagic,
+                });
+                relayed = true;
             }
             // The button is deliberately never spent: the same damage roll gets
             // walked across several targets, and the first click quite often lands
@@ -325,7 +388,7 @@ Hooks.once("init", async function () {
             // <input type="button">, whose label lives in `value` and has no children.
             const applied = (Number($btn.data('gbApplyCount')) || 0) + 1;
             $btn.data('gbApplyCount', applied);
-            const note = `нанесено: ${mitigated}${saveNote}` + (applied > 1 ? ` ×${applied}` : '');
+            const note = `${relayed ? 'отправлено ГМ' : 'нанесено'}: ${mitigated}${saveNote}` + (applied > 1 ? ` ×${applied}` : '');
             $btn.addClass('used');
             if ($btn.is('input')) {
                 if (!$btn.data('gbBaseLabel')) $btn.data('gbBaseLabel', $btn.val());
@@ -343,103 +406,152 @@ Hooks.once("init", async function () {
         }
     });
 
-    // A gift/word/artifact-power posted to chat with a saveType set shows this button.
-    // Whoever clicks it rolls the save for their OWN assigned character (not a stored
-    // target), since the poster doesn't know in advance who the effect will land on.
-    $(document).on('click', '.gift-save-roll-btn', ev => {
-        let $btn = $(ev.currentTarget);
-        let save = $btn.data('save');
-        let giftName = $btn.data('giftName');
-        // Optional pre-rolled damage (theurgy / low magic): apply on a FAILED save.
-        let dmgNormal = $btn.data('dmgNormal');
-        let dmgStraight = $btn.data('dmgStraight');
-        let dmgType = $btn.data('damageType');
-        let dmgIsMagic = $btn.data('isMagic');
-        let hasDamage = dmgNormal !== undefined && dmgNormal !== '' && dmgNormal !== null;
-        // Damage FORMULA (power-use cards, e.g. an Art level with effectType=save):
-        // nothing is pre-rolled there, so the damage is rolled here on a failed save.
-        let dmgFormula = $btn.data('dmgFormula');
-        let actor = game.user.character;
-        if (!actor) {
-            let controlled = canvas?.tokens?.controlled?.[0];
-            actor = controlled?.actor;
-        }
-        if (!actor) {
-            ui.notifications.warn("Нет назначенного персонажа для броска спасброска. Выберите токен или назначьте персонажа.");
-            return;
-        }
+    /**
+     * Бросить спасбросок одного актёра против силы и выложить карточку в чат.
+     * Права на актёра не нужны: бросок только читает system и ничего не меняет
+     * в документе, поэтому атакующий может бросить спас за чужую цель.
+     */
+    async function rollGiftSave(actor, {save, giftName, modifier, tokenUuid, dmg}) {
         // NPCs have a single flat save number used for EVERY save type (Стойкость /
         // Уклонение / Дух all resolve to system.save); only PCs have per-type saves.
-        let saveData = actor.type === 'npc'
+        const saveData = actor.type === 'npc'
             ? {save: actor.system.save}
             : actor.system.computed?.saves?.[save];
         if (!saveData || typeof saveData.save !== 'number') {
             ui.notifications.warn(`У ${actor.name} нет спасброска "${Label(save)}".`);
             return;
         }
-        PlayerRollDialog.create(actor, {rollType: `Спасбросок: ${Label(save)}`}, async (data) => {
-            let template = 'systems/godbound/templates/chat/saving-throw-result.html';
-            let chatData = {
-                author: game.user.id,
-                speaker: ChatMessage.getSpeaker({actor}),
+        const template = 'systems/godbound/templates/chat/saving-throw-result.html';
+        const chatData = {
+            author: game.user.id,
+            speaker: ChatMessage.getSpeaker({actor, token: actor.token}),
+        };
+        const templateData = {
+            title: 'Спасбросок',
+            details: `${Label(save)} против «${giftName}» - ${modifierLabel(modifier)}`,
+            data: {modifier},
+        };
+        const roll = new Roll('1d20 + @difficulty', {difficulty: modifier});
+        await roll.evaluate();
+        const target = saveData.save;
+        // Natural 1 always fails, natural 20 always succeeds.
+        const nat = roll.dice?.[0]?.results?.[0]?.result;
+        const result = {
+            isSuccess: nat === 20 || (nat !== 1 && roll.total >= target),
+            isFailure: nat === 1 || (nat !== 20 && roll.total < target),
+            target: target,
+        };
+        result.className = result.isSuccess ? 'result-msg-success' : 'result-msg-failure';
+        templateData.roll = await roll.render();
+        templateData.result = result;
+        templateData.data.actor = actor;
+        templateData.data.tokenUuid = tokenUuid ?? actor.token?.uuid ?? null;
+        chatData.rolls = [roll];
+        // On a failed save, offer a one-click "Нанести урон" against the same
+        // character that just rolled (the effect landed on them).
+        if (result.isFailure && dmg.hasDamage) {
+            templateData.data.damage = {
+                normal: dmg.normal,
+                straight: dmg.straight,
+                damageType: dmg.type,
+                isMagic: dmg.isMagic,
+                targetActorId: actor.id,
+                targetTokenUuid: templateData.data.tokenUuid,
             };
-            let templateData = {
-                title: 'Спасбросок',
-                details: `${Label(save)} против «${giftName}» - ${data.modifier < 0 ? 'Трудно' : data.modifier > 0 ? 'Легко' : 'Обычно'}`,
-                data: data,
-            };
-            let roll = new Roll('1d20 + @difficulty', {difficulty: data.modifier});
-            await roll.evaluate();
-            let target = saveData.save;
-            // Natural 1 always fails, natural 20 always succeeds.
-            const nat = roll.dice?.[0]?.results?.[0]?.result;
-            let result = {
-                isSuccess: nat === 20 || (nat !== 1 && roll.total >= target),
-                isFailure: nat === 1 || (nat !== 20 && roll.total < target),
-                target: target,
-            };
-            result.className = result.isSuccess ? 'result-msg-success' : 'result-msg-failure';
-            templateData.roll = await roll.render();
-            templateData.result = result;
-            templateData.data.actor = actor;
-            // On a failed save, offer a one-click "Нанести урон" against the same
-            // character that just rolled (the effect landed on them).
-            chatData.rolls = [roll];
-            if (result.isFailure && hasDamage) {
+        } else if (result.isFailure && (dmg.formula || Number(dmg.bonus))) {
+            // No pre-rolled numbers on the card — roll the damage now. Кубик
+            // необязателен: плоский урон приходит одним лишь бонусом.
+            const formula = buildDamageFormula(dmg.formula, dmg.bonus);
+            try {
+                const dmgRoll = new Roll(formula);
+                await dmgRoll.evaluate();
                 templateData.data.damage = {
-                    normal: dmgNormal,
-                    straight: dmgStraight,
-                    damageType: dmgType,
-                    isMagic: dmgIsMagic,
+                    normal: actor._toNormalDamage ? actor._toNormalDamage(dmgRoll) : dmgRoll.total,
+                    straight: dmgRoll.total,
+                    damageType: dmg.type || 'magic',
+                    isMagic: dmg.isMagic ?? true,
                     targetActorId: actor.id,
+                    targetTokenUuid: templateData.data.tokenUuid,
+                    rollHtml: await dmgRoll.render(),
                 };
-            } else if (result.isFailure && (dmgFormula || Number($btn.data('dmgBonus')))) {
-                // No pre-rolled numbers on the card — roll the damage now. Кубик
-                // необязателен: плоский урон приходит одним лишь бонусом.
-                const formula = buildDamageFormula(dmgFormula, $btn.data('dmgBonus'));
-                try {
-                    const dmgRoll = new Roll(formula);
-                    await dmgRoll.evaluate();
-                    templateData.data.damage = {
-                        normal: actor._toNormalDamage ? actor._toNormalDamage(dmgRoll) : dmgRoll.total,
-                        straight: dmgRoll.total,
-                        damageType: dmgType || 'magic',
-                        isMagic: dmgIsMagic ?? true,
-                        targetActorId: actor.id,
-                        rollHtml: await dmgRoll.render(),
-                    };
-                    chatData.rolls.push(dmgRoll);
-                } catch (e) {
-                    console.warn('Godbound | не удалось бросить урон по формуле', formula, e);
+                chatData.rolls.push(dmgRoll);
+            } catch (e) {
+                console.warn('Godbound | не удалось бросить урон по формуле', formula, e);
+            }
+        }
+        chatData.content = await renderTemplate(template, templateData);
+        if (game.dice3d) {
+            await game.dice3d.showForRoll(roll, game.user, true, chatData.whisper, chatData.blind);
+        } else {
+            chatData.sound = CONFIG.sounds.dice;
+        }
+        await ChatMessage.create(chatData);
+    }
+
+    // A gift/word/artifact-power posted to chat with a saveType set shows this button.
+    // Кто бросает:
+    //  1. автор карточки (или ГМ) — за цели, наведённые в момент применения силы
+    //     (они запечены в data-targets), даже без прав на эти листы;
+    //  2. автор, не наводивший цель при применении, — за цели, наведённые сейчас;
+    //  3. все остальные — за своего назначенного персонажа / выделенный токен
+    //     (эффект ударил по ним).
+    $(document).on('click', '.gift-save-roll-btn', ev => {
+        const $btn = $(ev.currentTarget);
+        const save = $btn.data('save');
+        const giftName = $btn.data('giftName');
+        // Optional pre-rolled damage (theurgy / low magic): apply on a FAILED save.
+        const dmgNormal = $btn.data('dmgNormal');
+        const dmg = {
+            normal: dmgNormal,
+            straight: $btn.data('dmgStraight'),
+            type: $btn.data('damageType'),
+            isMagic: $btn.data('isMagic'),
+            hasDamage: dmgNormal !== undefined && dmgNormal !== '' && dmgNormal !== null,
+            // Damage FORMULA (power-use cards, e.g. an Art level with effectType=save):
+            // nothing is pre-rolled there, so the damage is rolled here on a failed save.
+            formula: $btn.data('dmgFormula'),
+            bonus: $btn.data('dmgBonus'),
+        };
+
+        const messageId = $btn.closest('[data-message-id]').data('messageId');
+        const message = messageId ? game.messages.get(messageId) : null;
+        const isAuthor = !!message && (message.author?.id ?? message.user?.id) === game.user.id;
+
+        // Кого бросаем: список {actor, tokenUuid}.
+        let victims = [];
+        if (isAuthor || game.user.isGM) {
+            let baked = $btn.data('targets');
+            if (typeof baked === 'string') {
+                try { baked = JSON.parse(baked); } catch (e) { baked = null; }
+            }
+            if (Array.isArray(baked)) {
+                for (const t of baked) {
+                    const actor = resolveCardActor({tokenUuid: t.uuid, actorId: t.id});
+                    if (actor) victims.push({actor, tokenUuid: t.uuid});
                 }
             }
-            chatData.content = await renderTemplate(template, templateData);
-            if (game.dice3d) {
-                await game.dice3d.showForRoll(roll, game.user, true, chatData.whisper, chatData.blind);
-                await ChatMessage.create(chatData);
-            } else {
-                chatData.sound = CONFIG.sounds.dice;
-                await ChatMessage.create(chatData);
+        }
+        if (!victims.length && isAuthor && game.user.targets.size) {
+            victims = Array.from(game.user.targets)
+                .filter(t => t.actor)
+                .map(t => ({actor: t.actor, tokenUuid: t.document?.uuid ?? null}));
+        }
+        if (!victims.length) {
+            const controlled = canvas?.tokens?.controlled?.[0];
+            const actor = game.user.character || controlled?.actor;
+            if (actor) {
+                victims.push({actor, tokenUuid: controlled?.actor === actor ? controlled.document?.uuid : null});
+            }
+        }
+        if (!victims.length) {
+            ui.notifications.warn("Нет цели для спасброска: наведите цель (Target), выберите токен или назначьте персонажа.");
+            return;
+        }
+
+        const who = victims.length === 1 ? victims[0].actor.name : `${victims.length} целей`;
+        PlayerRollDialog.create(victims[0].actor, {rollType: `Спасбросок: ${Label(save)} — ${who}`}, async (data) => {
+            for (const v of victims) {
+                await rollGiftSave(v.actor, {save, giftName, modifier: data.modifier, tokenUuid: v.tokenUuid, dmg});
             }
         });
     });
@@ -470,9 +582,14 @@ Hooks.once("init", async function () {
     $(document).on('click', '.instant-auto-save', ev => {
         let span = $(ev.currentTarget);
         let actor = resolveCardActor({tokenUuid: span.data('tokenUuid'), actorId: span.data('actorId')});
-        if (actor) {
-            actor.autoSave();
+        if (!actor) return;
+        // Спас мог бросить атакующий за чужую цель — а авто-спасбросок тратит
+        // Усилие самой цели, поэтому решать (и платить) может только её владелец.
+        if (!actor.isOwner) {
+            ui.notifications.warn(`Авто-спасбросок применяет владелец «${actor.name}» или ГМ.`);
+            return;
         }
+        actor.autoSave();
     });
 
     if(!game.Godbound) {
@@ -809,6 +926,7 @@ const BACKFILL_VERSION = 3;
 
 Hooks.once("ready", async () => {
     registerFullAccessSocket();
+    game.Godbound?.registerDamageRelay?.();
     // Unlock the system compendiums for the GM and restore any library edits the
     // world remembers (see library.js). Runs before the backfills so a restored
     // pack is already in place if anything below reads from it.

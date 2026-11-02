@@ -71,6 +71,60 @@ export const buildDamageFormula = (damageRoll, damageBonus) => {
     return '';
 }
 
+/**
+ * Подпись модификатора броска для чата: «Обычно», «Легко (+4)», «Трудно (−4)»,
+ * а для произвольного числа — просто «+2» / «−3».
+ */
+export const modifierLabel = (mod) => {
+    const m = Number(mod) || 0;
+    if (m === 0) return 'Обычно';
+    const signed = m > 0 ? `+${m}` : `−${Math.abs(m)}`;
+    if (m === 4) return `Легко (${signed})`;
+    if (m === -4) return `Трудно (${signed})`;
+    return `Модификатор ${signed}`;
+};
+
+/**
+ * Значки активации силы для карточки чата — как метки «Действие / Бонусное
+ * действие» в D&D: как силу включают (Постоянно / Мгновенно / В свой ход /
+ * Действие / Кара) и чем за неё платят (Без Усилия / По желанию / Сцена / День).
+ * Флаги берутся с листа предмета; у предметов без флагов (оружие, сокровища)
+ * значков просто нет.
+ *
+ * @param {Item} item
+ * @param {string} [committed] — фактически вложенное Усилие (atWill/scene/day):
+ *        этот значок подсвечивается.
+ * @returns {string} HTML набора <span class="gb-tag">, может быть пустой строкой.
+ */
+export const powerTagsHtml = (item, committed) => {
+    const s = item?.system ?? {};
+    const tags = [];
+    const add = (label, icon, cls = '') =>
+        tags.push(`<span class="gb-tag${cls ? ' ' + cls : ''}"><i class="fas ${icon}"></i> ${label}</span>`);
+    if (s.greater) add('Больший', 'fa-star', 'gb-tag--greater');
+    if (s.constant) add('Постоянно', 'fa-infinity', 'gb-tag--activation');
+    if (s.instant) add('Мгновенно', 'fa-bolt', 'gb-tag--activation');
+    if (s.onTurn) add('В свой ход', 'fa-hourglass-half', 'gb-tag--activation');
+    if (s.action) add('Действие', 'fa-hand-fist', 'gb-tag--activation');
+    if (s.smite) add('Кара', 'fa-meteor', 'gb-tag--smite');
+    // Чудо без отметок о цене всё равно стоит Усилие на день (см. usePower).
+    const day = s.day || (item?.type === 'divineMiracle' && !s.atWill && !s.scene);
+    const effort = [
+        ['noEffort', s.noEffort, 'Без Усилия', 'fa-circle-play'],
+        ['atWill', s.atWill, 'По желанию', 'fa-power-off'],
+        ['scene', s.scene, 'Сцена', 'fa-clock'],
+        ['day', day, 'День', 'fa-sun'],
+    ];
+    for (const [key, on, label, icon] of effort) {
+        if (key === committed) {
+            add(`Усилие: ${label.toLowerCase()}`, icon, 'gb-tag--effort gb-tag--committed');
+        } else if (on && !committed) {
+            add(label, icon, 'gb-tag--effort');
+        }
+    }
+    return tags.join('');
+};
+
 /** Есть ли у предмета хоть какой-то урон (бросок или плоское число). */
 export const hasDamage = (system) => !!buildDamageFormula(system?.damageRoll, system?.damageBonus);
 

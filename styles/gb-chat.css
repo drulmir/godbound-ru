@@ -234,6 +234,25 @@
 .godbound.chat-block .gb-tag--smite i {
   color: #8c1d10;
 }
+/* Как силу включают (Постоянно / Мгновенно / В свой ход / Действие). */
+.godbound.chat-block .gb-tag--activation {
+  border-color: rgba(40, 80, 140, 0.45);
+  background: rgba(40, 80, 140, 0.08);
+  color: #23466f;
+}
+.godbound.chat-block .gb-tag--activation i {
+  color: #2e5a8c;
+}
+/* Чем платят (Без Усилия / По желанию / Сцена / День). Фактически вложенное
+   Усилие подсвечивается золотом. */
+.godbound.chat-block .gb-tag--committed {
+  border-color: var(--gb-gold-dark);
+  background: rgba(190, 150, 60, 0.18);
+  color: var(--gb-ink);
+}
+.godbound.chat-block .gb-tag--greater i {
+  color: #b8860b;
+}
 
 /* ---------------------------------------------------------------------------
    4. Строка «кто / чем»
@@ -834,6 +853,41 @@
   border-color: #b8860b;
   box-shadow: 0 0 4px rgba(184, 134, 11, 0.55);
   outline: none;
+}
+/* Диалог броска: быстрые ±4 и поле для своего модификатора. */
+.godbound.gb-dialog .gb-mod-presets {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 6px;
+}
+.godbound.gb-dialog .gb-mod-preset {
+  flex: 1 1 0;
+  height: 26px;
+  margin: 0;
+  padding: 0 4px;
+  border: 1px solid #b9a06a;
+  border-radius: 3px;
+  background: rgba(255, 249, 233, 0.75);
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.godbound.gb-dialog .gb-mod-preset.active {
+  border-color: #8a6d1f;
+  background: rgba(190, 150, 60, 0.3);
+  font-weight: 700;
+}
+.godbound.gb-dialog .gb-mod-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.godbound.gb-dialog .gb-mod-custom span {
+  flex: 0 0 auto;
 }
 
 /* ---------------------------------------------------------------------------

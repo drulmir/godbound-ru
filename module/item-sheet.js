@@ -87,6 +87,67 @@ export class GodboundItemSheet extends foundry.appv1.sheets.ItemSheet {
 
   /* -------------------------------------------- */
 
+  /** Описание предмета в чат: у владельца — полноценная карточка силы. */
+  _postToChat(item) {
+    if(this.actor) {
+      this.actor.demonstratePower(item);
+    } else {
+      ChatMessage.create({
+        content:
+          `<div class="godbound chat-block gb-card gb-card--power">` +
+          `<h2 class="gb-title"><span class="gb-title__text">${esc(TypeNames(item.type) || 'Предмет')}</span></h2>` +
+          `<div class="gb-actor">` +
+          `<div class="gb-portraits"><img class="gb-portrait" src="${esc(itemChatImage(item))}" alt=""></div>` +
+          `<div class="gb-names"><span class="gb-name" title="${esc(item.name)}">${esc(item.name)}</span></div></div>` +
+          `<div class="gb-desc${isPlainDescription(item.system.description) ? ' gb-desc--pre' : ''}">` +
+          `${item.system.description ?? ''}</div></div>`,
+      });
+    }
+  }
+
+  /** Удалить предмет с листа владельца. Артефакт — только без своих сил. */
+  async _deleteItem({confirm = false} = {}) {
+    const item = this.item;
+    if(!item.actor) return;
+    if(item.type === 'artifact' && item.actor.hasArtifactPowersUnder(item.id)) {
+      ui.notifications.warn("Сначала удалите силы артефакта по отдельности, затем удаляйте артефакт.");
+      return;
+    }
+    if(confirm) {
+      const ok = await foundry.appv1.api.Dialog.confirm({
+        title: 'Удаление',
+        content: `<p>Удалить «<b>${esc(item.name)}</b>» у ${esc(item.actor.name)}?</p>`,
+      });
+      if(!ok) return;
+    }
+    await item.actor.deleteEmbeddedDocuments('Item', [item.id]);
+  }
+
+  /**
+   * «В чат» и «Удалить» дублируются в заголовок окна: на длинных листах (Дар,
+   * Артефакт, Искусство) строка «Действия» в самом низу уезжает за нижний край
+   * невысокого экрана, а заголовок виден всегда.
+   * @override
+   */
+  _getHeaderButtons() {
+    const buttons = super._getHeaderButtons();
+    const extra = [{
+      label: 'В чат',
+      class: 'gb-header-chat',
+      icon: 'fas fa-comment',
+      onclick: () => this._postToChat(this.item),
+    }];
+    if(this.options.editable && this.item.actor) {
+      extra.push({
+        label: 'Удалить',
+        class: 'gb-header-delete',
+        icon: 'fas fa-trash',
+        onclick: () => this._deleteItem({confirm: true}),
+      });
+    }
+    return [...extra, ...buttons];
+  }
+
   activateListeners(html) {
     super.activateListeners(html);
 
@@ -121,20 +182,7 @@ export class GodboundItemSheet extends foundry.appv1.sheets.ItemSheet {
       } else {
         item = this.item;
       }
-      if(this.actor) {
-        this.actor.demonstratePower(item);
-      } else {
-        ChatMessage.create({
-          content:
-            `<div class="godbound chat-block gb-card gb-card--power">` +
-            `<h2 class="gb-title"><span class="gb-title__text">${esc(TypeNames(item.type) || 'Предмет')}</span></h2>` +
-            `<div class="gb-actor">` +
-            `<div class="gb-portraits"><img class="gb-portrait" src="${esc(itemChatImage(item))}" alt=""></div>` +
-            `<div class="gb-names"><span class="gb-name" title="${esc(item.name)}">${esc(item.name)}</span></div></div>` +
-            `<div class="gb-desc${isPlainDescription(item.system.description) ? ' gb-desc--pre' : ''}">` +
-            `${item.system.description ?? ''}</div></div>`,
-        });
-      }
+      this._postToChat(item);
     });
 
     // Add the gift's built-in attack to the owning actor (checks for duplicates there).
@@ -158,17 +206,7 @@ export class GodboundItemSheet extends foundry.appv1.sheets.ItemSheet {
         this.maybeDeleteActive = true;
       }
     });
-    html.find('.item-delete').click(ev => {
-      if(this.item.type === 'artifact') {
-        if(this.item.actor && this.item.actor.hasArtifactPowersUnder(this.item.id)) {
-          ui.notifications.warn("Сначала удалите силы артефакта по отдельности, затем удаляйте артефакт.");
-          return;
-        }
-      }
-      if(this.item.actor) {
-        this.item.actor.deleteEmbeddedDocuments('Item', [this.item.id]);
-      }
-    });
+    html.find('.item-delete').click(() => this._deleteItem());
 
     html.find('.itemAdder').click(async ev => {
       const $i = $(ev.currentTarget);
